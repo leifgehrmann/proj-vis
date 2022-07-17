@@ -5,13 +5,25 @@ import proj4 from 'proj4'
 const projection = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs '
 
 onMounted(() => {
-  const canvas2 = document.getElementById("myCanvas2");
+  const canvas2 = document.getElementById("myCanvas2") as HTMLCanvasElement|null;
+  if (canvas2 === null) {
+    return
+  }
   const ctx2 = canvas2.getContext("2d");
+  if (ctx2 === null) {
+    return
+  }
   ctx2.fillStyle = "#000000";
   ctx2.fillRect(0, 0, 400, 400);
 
-  const canvas = document.getElementById("myCanvas");
+  const canvas = document.getElementById("myCanvas") as HTMLCanvasElement|null;
+  if (canvas === null) {
+    return
+  }
   const ctx = canvas.getContext("2d");
+  if (ctx === null) {
+    return
+  }
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, 400, 400);
 
@@ -97,7 +109,7 @@ onMounted(() => {
             autocomplete="off"
             :value="projection"
           ></textarea>
-          <p :class="{invisible: true}">Valid projection</p>
+          <p :class="{invisible: false}">Invalid projection.</p>
         </div>
         <div><label for="bbox">Boundary Box:</label></div>
         <div>
@@ -106,7 +118,7 @@ onMounted(() => {
         <div><label for="detail">Detail:</label></div>
         <div>
           <input id="detail" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="1">
-          <p :class="{invisible: false}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1 million samples. </p>
+          <p :class="{invisible: false}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1,000,000 samples. </p>
         </div>
       </div>
       <div class="my-2 border-2 border-white aspect-[2/1] bg-black">
