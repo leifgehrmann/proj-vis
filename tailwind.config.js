@@ -10,10 +10,6 @@ module.exports = {
         sans: ['ui-sans-serif', 'Helvetica', 'sans-serif'],
       },
     },
-    screens: {
-      'sm': '640px',
-      'md': '768px'
-    },
   },
   plugins: [],
 }

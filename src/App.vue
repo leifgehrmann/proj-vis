@@ -22,6 +22,9 @@ onMounted(async () => {
 
   const inputMapCanvas = document.createElement('canvas');
   const inputMapCtx = inputMapCanvas.getContext('2d');
+  if (inputMapCtx === null) {
+    return
+  }
 
   inputMapCanvas.width = inputMapImg.naturalWidth;
   inputMapCanvas.height = inputMapImg.naturalHeight;
@@ -134,42 +137,47 @@ onMounted(async () => {
     <header class="p-5">
       <h1 class="text-center font-black italic text-3xl">proj-vis</h1>
     </header>
-    <article class="px-2 flex flex-col">
-      <div class="grid grid-cols-2 auto-cols-max gap-y-2" style="grid-template-columns: 30% 70%;">
-        <div><label for="projection">Proj4:</label></div>
-        <div>
-          <textarea
-            id="projection"
-            class="block w-full h-32 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500"
-            autocapitalize="off"
-            autocomplete="off"
-            :value="projection"
-          ></textarea>
-          <p :class="{invisible: false}">Invalid projection.</p>
-        </div>
-        <div><label for="bbox">Boundary Box:</label></div>
-        <div>
-          <input id="bbox" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="-90, -180, 90, 180">
-        </div>
-        <div><label for="detail">Detail:</label></div>
-        <div>
-          <input id="detail" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="1">
-          <p :class="{invisible: false}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1,000,000 samples. </p>
+    <article class="px-2 grid grid-cols-1 gap-y-2 xl:grid-cols-2 xl:gap-x-2 xl:gap-y-0">
+      <div>
+        <div class="grid grid-cols-2 auto-cols-max gap-y-2" style="grid-template-columns: 30% 70%;">
+          <div><label for="projection">Proj4:</label></div>
+          <div>
+            <textarea
+              id="projection"
+              class="block w-full h-32 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500"
+              autocapitalize="off"
+              autocomplete="off"
+              :value="projection"
+            ></textarea>
+            <p :class="{invisible: true}">Invalid projection.</p>
+          </div>
+          <div><label for="bbox">Boundary Box:</label></div>
+          <div>
+            <input id="bbox" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="-90, -180, 90, 180">
+          </div>
+          <div><label for="detail">Detail:</label></div>
+          <div>
+            <input id="detail" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="1">
+            <p class="my-2" :class="{invisible: false}">360 × 180 = 64,800 samples</p>
+<!--            <p :class="{invisible: true}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1,000,000 samples. </p>-->
+          </div>
+          <div class="col-span-2 border-2 border-white bg-black">
+            <img
+                id="inputMap"
+                alt="The world map"
+                class="w-full aspect-[2/1]"
+                :src="seaLandImage"
+            >
+          </div>
         </div>
       </div>
-      <div class="my-2 border-2 border-white bg-black">
-        <img
-          id="inputMap"
-          alt="The world map"
-          class="w-full aspect-[2/1]"
-          :src="seaLandImage"
-        >
-      </div>
-      <div class="my-2 border-2 border-white w-full aspect-[2/1] bg-black">
-        <canvas id="myCanvas2" class="w-full" width="800" height="800"></canvas>
-      </div>
-      <div class="my-2 border-2 border-white aspect-[1/1] bg-black">
-        <canvas id="myCanvas" class="w-full" width="1000" height="1000"></canvas>
+      <div class="grid grid-cols-1 gap-y-2">
+        <div class="border-2 border-white w-full aspect-[2/1] bg-black">
+          <canvas id="myCanvas2" class="w-full" width="800" height="800"></canvas>
+        </div>
+        <div class="border-2 border-white aspect-[1/1] bg-black">
+          <canvas id="myCanvas" class="w-full" width="1000" height="1000"></canvas>
+        </div>
       </div>
     </article>
     <footer class="sm:p-10 text-center">
