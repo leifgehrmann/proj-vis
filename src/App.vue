@@ -1,19 +1,43 @@
 <script setup lang="ts">
 import './index.css'
-import { ref, onMounted } from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import proj4 from 'proj4'
 import seaLandImage from './assets/sea-land.png'
+import {getProjectionExamples} from "./exampleProjections";
+import {debounce} from "./debounce";
 
-let projection = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs '
+const projectionExamples = getProjectionExamples()
+const selectedExample = ref(0)
+let projection = ref('')
+let latRangeMin = ref(0)
+let latRangeMax = ref(0)
+let lonRangeMin = ref(0)
+let lonRangeMax = ref(0)
+let step = ref(0)
+
+function updateSelectedExampleValues() {
+  const selectedExampleIndex = selectedExample.value
+  console.log(selectedExampleIndex)
+  projection.value = projectionExamples[selectedExampleIndex].proj4
+  latRangeMin.value = projectionExamples[selectedExampleIndex].latRangeMin
+  latRangeMax.value = projectionExamples[selectedExampleIndex].latRangeMax
+  lonRangeMin.value = projectionExamples[selectedExampleIndex].lonRangeMin
+  lonRangeMax.value = projectionExamples[selectedExampleIndex].lonRangeMax
+  step.value = projectionExamples[selectedExampleIndex].step
+}
+
 function loadImage(imgElement: HTMLImageElement): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     imgElement.onload = () => {
+      resolve()
+    }
+    if (imgElement.complete) {
       resolve()
     }
   })
 }
 
-onMounted(async () => {
+async function displayProjection() {
   const inputMapImg = document.querySelector('#inputMap') as HTMLImageElement;
 
   console.log(inputMapImg.src)
@@ -53,20 +77,19 @@ onMounted(async () => {
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, 1000, 1000);
 
-  const transformer = proj4(projection);
+  const transformer = proj4(projection.value);
   const xValues = []
   const yValues = []
   const validLons = []
   const validLats = []
   const inputMapColors = []
 
-  const minLatRange = -90
-  const maxLatRange = 90
-  const minLonRange = -180
-  const maxLonRange = 180
-  const dxLatRange = 1
-  const dxLonRange = 1
-
+  const minLatRange = latRangeMin.value
+  const maxLatRange = latRangeMax.value
+  const minLonRange = lonRangeMin.value
+  const maxLonRange = lonRangeMax.value
+  const dxLatRange = step.value
+  const dxLonRange = step.value
 
   for (let lat = minLatRange; lat < maxLatRange; lat += dxLatRange) {
     for (let lon = minLonRange; lon < maxLonRange; lon += dxLonRange) {
@@ -122,12 +145,28 @@ onMounted(async () => {
   }
 
   for (let i = 0; i < validLons.length; i++) {
-    const x = ((validLons[i] - minLon) / (dLon) * (maxLonRange - minLonRange) / dxLonRange) * 2
-    const y = ((-validLats[i] - minLat) / (dLat) * (maxLatRange - minLatRange) / dxLatRange) * 2
+    const x = ((validLons[i] - minLon) / (dLon) * (maxLonRange - minLonRange) / dxLonRange) * 2 * step.value
+    const y = ((-validLats[i] - minLat) / (dLat) * (maxLatRange - minLatRange) / dxLatRange) * 2 * step.value
     const color = inputMapColors[i]
     ctx2.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
     ctx2.fillRect(x, y, 2, 2);
   }
+}
+
+const debouncedDisplayProjection = debounce(displayProjection, 500)
+
+onMounted(async () => {
+  updateSelectedExampleValues()
+  await displayProjection()
+})
+
+watch([selectedExample], async () => {
+  updateSelectedExampleValues()
+  await displayProjection()
+})
+
+watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], () => {
+  debouncedDisplayProjection()
 })
 
 </script>
@@ -139,7 +178,21 @@ onMounted(async () => {
     </header>
     <article class="px-2 grid grid-cols-1 gap-y-2 xl:grid-cols-2 xl:gap-x-2 xl:gap-y-0">
       <div>
-        <div class="grid grid-cols-2 auto-cols-max gap-y-2" style="grid-template-columns: 30% 70%;">
+        <div class="grid grid-cols-2 auto-cols-max gap-y-2 gap-x-2" style="grid-template-columns: calc(30% - 0.5rem) 70%;">
+          <div><label for="example">Example:</label></div>
+          <div>
+            <select
+                id="example"
+                class="block w-full pl-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500 rounded-none"
+                v-model="selectedExample"
+            >
+              <option
+                  v-for="(projectionExample, index) in projectionExamples"
+                  :label="projectionExample.label"
+                  :value="index"
+              />
+            </select>
+          </div>
           <div><label for="projection">Proj4:</label></div>
           <div>
             <textarea
@@ -147,17 +200,48 @@ onMounted(async () => {
               class="block w-full h-32 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500"
               autocapitalize="off"
               autocomplete="off"
-              :value="projection"
+              v-model="projection"
             ></textarea>
             <p :class="{invisible: true}">Invalid projection.</p>
           </div>
-          <div><label for="bbox">Boundary Box:</label></div>
-          <div>
-            <input id="bbox" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="-90, -180, 90, 180">
+          <div><label for="latRangeMin">Latitude Range:</label></div>
+          <div class="grid grid-cols-2 gap-x-2 place-content-start">
+            <input
+                id="latRangeMin"
+                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
+                type="number"
+                v-model="latRangeMin"
+            >
+            <input
+                id="latRangeMax"
+                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
+                type="number"
+                v-model="latRangeMax"
+            >
           </div>
-          <div><label for="detail">Detail:</label></div>
+          <div><label for="lonRangeMin">Longitude Range:</label></div>
+          <div class="grid grid-cols-2 gap-x-2 place-content-start">
+            <input
+                id="lonRangeMin"
+                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
+                type="number"
+                v-model="lonRangeMin"
+            >
+            <input
+                id="lonRangeMax"
+                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
+                type="number"
+                v-model="lonRangeMax"
+            >
+          </div>
+          <div><label for="step">Step:</label></div>
           <div>
-            <input id="detail" class="w-full sm:w-64 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500" type="text" value="1">
+            <input
+                id="step"
+                class="w-1/3 sm:w-24 pl-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500"
+                type="number"
+                v-model="step"
+            >
             <p class="my-2" :class="{invisible: false}">360 × 180 = 64,800 samples</p>
 <!--            <p :class="{invisible: true}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1,000,000 samples. </p>-->
           </div>
