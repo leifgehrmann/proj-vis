@@ -5,6 +5,7 @@ import proj4 from 'proj4'
 import seaLandImage from './assets/sea-land.png'
 import {getProjectionExamples} from "./exampleProjections";
 import {debounce} from "./debounce";
+import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
 
 const projectionExamples = getProjectionExamples()
 const selectedExample = ref(0)
@@ -53,17 +54,6 @@ async function displayProjection() {
   inputMapCanvas.width = inputMapImg.naturalWidth;
   inputMapCanvas.height = inputMapImg.naturalHeight;
   inputMapCtx.drawImage(inputMapImg, 0, 0);
-
-  const canvas2 = document.getElementById("myCanvas2") as HTMLCanvasElement|null;
-  if (canvas2 === null) {
-    return
-  }
-  const ctx2 = canvas2.getContext("2d");
-  if (ctx2 === null) {
-    return
-  }
-  ctx2.fillStyle = "#000000";
-  ctx2.fillRect(0, 0, 800, 800);
 
   const canvas = document.getElementById("myCanvas") as HTMLCanvasElement|null;
   if (canvas === null) {
@@ -129,13 +119,6 @@ async function displayProjection() {
     rHeight = 1000
   }
 
-  const minLon = validLons.reduce((a, b) => Math.min(a, b))
-  const maxLon = validLons.reduce((a, b) => Math.max(a, b))
-  const dLon = maxLon - minLon
-  const minLat = validLats.reduce((a, b) => Math.min(a, b))
-  const maxLat = validLats.reduce((a, b) => Math.max(a, b))
-  const dLat = maxLat - minLat
-
   for (let i = 0; i < xValues.length; i++) {
     const roundedX = Math.round((xValues[i] - minX) / (dX) * rWidth)
     const roundedY = Math.round((rHeight-(yValues[i] - minY) / (dY) * rHeight))
@@ -144,13 +127,20 @@ async function displayProjection() {
     ctx.fillRect(roundedX, roundedY, 2, 2);
   }
 
-  for (let i = 0; i < validLons.length; i++) {
-    const x = ((validLons[i] - minLon) / (dLon) * (maxLonRange - minLonRange) / dxLonRange) * 2 * step.value
-    const y = ((-validLats[i] - minLat) / (dLat) * (maxLatRange - minLatRange) / dxLatRange) * 2 * step.value
-    const color = inputMapColors[i]
-    ctx2.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-    ctx2.fillRect(x, y, 2, 2);
+  const validCoordinatesContainer = document.getElementById("myCanvas2") as HTMLDivElement|null;
+  if (validCoordinatesContainer === null) {
+    return
   }
+  const validCoordinatesCanvas = createValidCoordinatesCanvas(
+      step.value,
+      validLons,
+      validLats,
+      inputMapColors
+  )
+
+  // validCoordinatesCanvas.classList.add('w-full')
+  validCoordinatesCanvas.style.imageRendering = 'pixelated'
+  validCoordinatesContainer.replaceChildren(validCoordinatesCanvas)
 }
 
 const debouncedDisplayProjection = debounce(displayProjection, 500)
