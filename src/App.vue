@@ -6,6 +6,7 @@ import seaLandImage from './assets/sea-land.png'
 import {getProjectionExamples} from "./exampleProjections";
 import {debounce} from "./debounce";
 import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
+import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
 
 const projectionExamples = getProjectionExamples()
 const selectedExample = ref(0)
@@ -55,18 +56,6 @@ async function displayProjection() {
   inputMapCanvas.height = inputMapImg.naturalHeight;
   inputMapCtx.drawImage(inputMapImg, 0, 0);
 
-  const canvas = document.getElementById("myCanvas") as HTMLCanvasElement|null;
-  if (canvas === null) {
-    return
-  }
-  const ctx = canvas.getContext("2d");
-  if (ctx === null) {
-    return
-  }
-
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, 1000, 1000);
-
   const transformer = proj4(projection.value);
   const xValues = []
   const yValues = []
@@ -104,28 +93,18 @@ async function displayProjection() {
     return
   }
 
-  const minX = xValues.reduce((a, b) => Math.min(a, b))
-  const maxX = xValues.reduce((a, b) => Math.max(a, b))
-  const dX = maxX - minX
-  const minY = yValues.reduce((a, b) => Math.min(a, b))
-  const maxY = yValues.reduce((a, b) => Math.max(a, b))
-  const dY = maxY - minY
-
-  const ratio = dX / dY
-  let rWidth = 1000
-  let rHeight = 1000 / ratio
-  if (ratio < 1) {
-    rWidth = 1000 * ratio
-    rHeight = 1000
+  const projectedCoordinatesContainer = document.getElementById("myCanvas") as HTMLDivElement|null;
+  if (projectedCoordinatesContainer === null) {
+    return
   }
 
-  for (let i = 0; i < xValues.length; i++) {
-    const roundedX = Math.round((xValues[i] - minX) / (dX) * rWidth)
-    const roundedY = Math.round((rHeight-(yValues[i] - minY) / (dY) * rHeight))
-    const color = inputMapColors[i]
-    ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-    ctx.fillRect(roundedX, roundedY, 2, 2);
-  }
+  const projectedCoordinatesCanvas = createProjectedCoordinatesCanvas(
+      xValues,
+      yValues,
+      inputMapColors
+  )
+  projectedCoordinatesCanvas.style.imageRendering = 'pixelated'
+  projectedCoordinatesContainer.replaceChildren(projectedCoordinatesCanvas)
 
   const validCoordinatesContainer = document.getElementById("myCanvas2") as HTMLDivElement|null;
   if (validCoordinatesContainer === null) {
@@ -246,11 +225,9 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
         </div>
       </div>
       <div class="grid grid-cols-1 gap-y-2">
-        <div class="border-2 border-white w-full aspect-[2/1] bg-black">
-          <canvas id="myCanvas2" class="w-full" width="800" height="800"></canvas>
+        <div class="border-2 border-white w-full aspect-[2/1]" id="myCanvas2">
         </div>
-        <div class="border-2 border-white aspect-[1/1] bg-black">
-          <canvas id="myCanvas" class="w-full" width="1000" height="1000"></canvas>
+        <div class="border-2 border-white aspect-[1/1]" id="myCanvas">
         </div>
       </div>
     </article>
