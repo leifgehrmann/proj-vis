@@ -103,7 +103,10 @@ async function displayProjection() {
       yValues,
       inputMapColors
   )
-  projectedCoordinatesCanvas.style.imageRendering = 'pixelated'
+
+  projectedCoordinatesCanvas.style.objectFit = 'contain'
+  projectedCoordinatesCanvas.classList.add('w-full')
+  projectedCoordinatesCanvas.classList.add('h-full')
   projectedCoordinatesContainer.replaceChildren(projectedCoordinatesCanvas)
 
   const validCoordinatesContainer = document.getElementById("myCanvas2") as HTMLDivElement|null;
@@ -117,8 +120,10 @@ async function displayProjection() {
       inputMapColors
   )
 
-  // validCoordinatesCanvas.classList.add('w-full')
   validCoordinatesCanvas.style.imageRendering = 'pixelated'
+  validCoordinatesCanvas.style.objectFit = 'contain'
+  validCoordinatesCanvas.classList.add('w-full')
+  validCoordinatesCanvas.classList.add('h-full')
   validCoordinatesContainer.replaceChildren(validCoordinatesCanvas)
 }
 
@@ -225,9 +230,9 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
         </div>
       </div>
       <div class="grid grid-cols-1 gap-y-2">
-        <div class="border-2 border-white w-full aspect-[2/1]" id="myCanvas2">
+        <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="myCanvas2">
         </div>
-        <div class="border-2 border-white aspect-[1/1]" id="myCanvas">
+        <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="myCanvas">
         </div>
       </div>
     </article>

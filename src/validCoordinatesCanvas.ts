@@ -18,9 +18,6 @@ export function createValidCoordinatesCanvas(
     throw new Error('Failed to get 2d context')
   }
 
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   for (let i = 0; i < validLats.length; i++) {
     const lon = validLons[i]
     const lat = validLats[i]

@@ -26,15 +26,12 @@ export function createProjectedCoordinatesCanvas(
     throw new Error('Failed to get 2d context')
   }
 
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
   for (let i = 0; i < xValues.length; i++) {
-    const roundedX = Math.round((xValues[i] - bbox.minX) / (dX) * rWidth)
-    const roundedY = Math.round((rHeight-(yValues[i] - bbox.minY) / (dY) * rHeight))
+    const x = (xValues[i] - bbox.minX) / (dX) * rWidth
+    const y = (rHeight-(yValues[i] - bbox.minY) / (dY) * rHeight)
     const color = colorMap[i]
     ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
-    ctx.fillRect(roundedX, roundedY, 1, 1);
+    ctx.fillRect(x-1, y-1, 2, 2);
   }
 
   return canvas
