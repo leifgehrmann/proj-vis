@@ -7,6 +7,7 @@ import {getProjectionExamples} from "./exampleProjections";
 import {debounce} from "./debounce";
 import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
 import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
+import ProjectionInput from "./components/ProjectionInput.vue";
 
 const projectionExamples = getProjectionExamples()
 const selectedExample = ref(0)
@@ -169,14 +170,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
           </div>
           <div><label for="projection">Proj4:</label></div>
           <div>
-            <textarea
-              id="projection"
-              class="block w-full h-32 px-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500"
-              autocapitalize="off"
-              autocomplete="off"
-              v-model="projection"
-            ></textarea>
-            <p :class="{invisible: true}">Invalid projection.</p>
+            <ProjectionInput v-model:projection="projection" />
           </div>
           <div><label for="latRangeMin">Latitude Range:</label></div>
           <div class="grid grid-cols-2 gap-x-2 place-content-start">
