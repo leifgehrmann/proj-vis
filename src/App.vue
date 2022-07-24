@@ -2,7 +2,7 @@
 import './index.css'
 import {ref, onMounted, watch} from 'vue'
 import proj4 from 'proj4'
-import {getProjectionExamples} from "./exampleProjections";
+import {getProjectionExampleOptions, getProjectionExamples} from "./exampleProjections";
 import {debounce} from "./debounce";
 import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
 import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
@@ -10,7 +10,8 @@ import ProjectionInput from "./components/ProjectionInput.vue";
 import RangeInput from "./components/RangeInput.vue";
 
 const projectionExamples = getProjectionExamples()
-const selectedExample = ref(0)
+const projectionExampleOptions = getProjectionExampleOptions()
+const selectedExample = ref(-1)
 let projection = ref('')
 let latRangeMin = ref(0)
 let latRangeMax = ref(0)
@@ -19,8 +20,10 @@ let lonRangeMax = ref(0)
 let step = ref(0)
 
 function updateSelectedExampleValues() {
-  const selectedExampleIndex = selectedExample.value
-  console.log(selectedExampleIndex)
+  let selectedExampleIndex = selectedExample.value
+  if (selectedExampleIndex === -1) {
+    return
+  }
   projection.value = projectionExamples[selectedExampleIndex].proj4
   latRangeMin.value = projectionExamples[selectedExampleIndex].latRangeMin
   latRangeMax.value = projectionExamples[selectedExampleIndex].latRangeMax
@@ -158,14 +161,19 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
           <div>
             <select
                 id="example"
-                class="block w-full pl-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500 rounded-none"
+                class="block w-full pl-2 border-2 border-white bg-red-500 focus:ring focus:ring-blue-500 rounded-none"
                 v-model="selectedExample"
             >
-              <option
-                  v-for="(projectionExample, index) in projectionExamples"
-                  :label="projectionExample.label"
-                  :value="index"
-              />
+              <option value="-1">Select an example…</option>
+              <optgroup
+                  v-for="(projectionExampleGroup) in projectionExampleOptions"
+                  :label="projectionExampleGroup.label"
+              >
+                <option
+                    v-for="(projectionExampleId) in projectionExampleGroup.options"
+                    :value="projectionExampleId"
+                >{{projectionExamples[projectionExampleId].label}}</option>
+              </optgroup>
             </select>
           </div>
           <div><label for="projection">Proj4:</label></div>
