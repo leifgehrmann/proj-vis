@@ -87,6 +87,10 @@ async function displayProjection() {
   const dxLatRange = step.value
   const dxLonRange = step.value
 
+  if (step.value <= 0.001) {
+    console.error('Step value cannot be so low')
+    return
+  }
 
   let samplesTotal = Math.floor((maxLatRange - minLatRange) / dxLatRange) * Math.floor((maxLonRange - minLonRange) / dxLonRange)
   let samplesCollected = 0;
