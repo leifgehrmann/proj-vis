@@ -2,12 +2,12 @@
 import './index.css'
 import {ref, onMounted, watch} from 'vue'
 import proj4 from 'proj4'
-import seaLandImage from './assets/sea-land.png'
 import {getProjectionExamples} from "./exampleProjections";
 import {debounce} from "./debounce";
 import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
 import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
 import ProjectionInput from "./components/ProjectionInput.vue";
+import RangeInput from "./components/RangeInput.vue";
 
 const projectionExamples = getProjectionExamples()
 const selectedExample = ref(0)
@@ -172,55 +172,13 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
           <div>
             <ProjectionInput v-model:projection="projection" />
           </div>
-          <div><label for="latRangeMin">Latitude Range:</label></div>
-          <div class="grid grid-cols-2 gap-x-2 place-content-start">
-            <input
-                id="latRangeMin"
-                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
-                type="number"
-                v-model="latRangeMin"
-            >
-            <input
-                id="latRangeMax"
-                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
-                type="number"
-                v-model="latRangeMax"
-            >
-          </div>
-          <div><label for="lonRangeMin">Longitude Range:</label></div>
-          <div class="grid grid-cols-2 gap-x-2 place-content-start">
-            <input
-                id="lonRangeMin"
-                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
-                type="number"
-                v-model="lonRangeMin"
-            >
-            <input
-                id="lonRangeMax"
-                class="pl-2 border-2 border-white text-right font-mono bg-red-500 focus:ring focus:ring-blue-500"
-                type="number"
-                v-model="lonRangeMax"
-            >
-          </div>
-          <div><label for="step">Step:</label></div>
-          <div>
-            <input
-                id="step"
-                class="w-1/3 sm:w-24 pl-2 border-2 border-white font-mono bg-red-500 focus:ring focus:ring-blue-500"
-                type="number"
-                v-model="step"
-            >
-            <p class="my-2" :class="{invisible: false}">360 × 180 = 64,800 samples</p>
-<!--            <p :class="{invisible: true}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1,000,000 samples. </p>-->
-          </div>
-          <div class="col-span-2 border-2 border-white bg-black">
-            <img
-                id="inputMap"
-                alt="The world map"
-                class="w-full aspect-[2/1]"
-                :src="seaLandImage"
-            >
-          </div>
+          <RangeInput
+              v-model:lat-range-min="latRangeMin"
+              v-model:lat-range-max="latRangeMax"
+              v-model:lon-range-min="lonRangeMin"
+              v-model:lon-range-max="lonRangeMax"
+              v-model:step="step"
+          />
         </div>
       </div>
       <div class="grid grid-cols-1 gap-y-2">
