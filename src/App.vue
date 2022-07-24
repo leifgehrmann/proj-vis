@@ -117,7 +117,7 @@ async function displayProjection() {
       yValues.push(value[1])
       validLons.push(lon)
       validLats.push(lat)
-      const inputMapImgX = Math.round((lon + 180)/360 * inputMapImg.naturalWidth)
+      const inputMapImgX = Math.round((lon + 180 + 360)/360 * inputMapImg.naturalWidth) % inputMapImg.naturalWidth
       const inputMapImgY = Math.round((-lat + 90)/180 * inputMapImg.naturalHeight)
       inputMapColors.push(inputMapCtx.getImageData(
           inputMapImgX, inputMapImgY, 1, 1
