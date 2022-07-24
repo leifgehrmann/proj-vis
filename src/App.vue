@@ -8,16 +8,20 @@ import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
 import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
 import ProjectionInput from "./components/ProjectionInput.vue";
 import RangeInput from "./components/RangeInput.vue";
+import {waitForAnimationFrame} from "./waitForAnimationFrame";
 
 const projectionExamples = getProjectionExamples()
 const projectionExampleOptions = getProjectionExampleOptions()
 const selectedExample = ref(-1)
 let projection = ref('')
-let latRangeMin = ref(0)
-let latRangeMax = ref(0)
-let lonRangeMin = ref(0)
-let lonRangeMax = ref(0)
-let step = ref(0)
+let latRangeMin = ref(-90)
+let latRangeMax = ref(90)
+let lonRangeMin = ref(-180)
+let lonRangeMax = ref(180)
+let step = ref(1)
+let processId = ref(0)
+let progress = ref(0)
+let totalProjectedSamples = ref(0)
 
 function updateSelectedExampleValues() {
   let selectedExampleIndex = selectedExample.value
@@ -44,9 +48,18 @@ function loadImage(imgElement: HTMLImageElement): Promise<void> {
 }
 
 async function displayProjection() {
+  const currentProcessId = Date.now()
+  processId.value = currentProcessId
   const inputMapImg = document.querySelector('#inputMap') as HTMLImageElement;
+  const projectedCoordinatesContainer = document.getElementById("projectedCoordinatesContainer") as HTMLDivElement|null;
+  const validCoordinatesContainer = document.getElementById("validCoordinatesContainer") as HTMLDivElement|null;
 
-  console.log(inputMapImg.src)
+  if (projectedCoordinatesContainer === null) {
+    return
+  }
+  if (validCoordinatesContainer === null) {
+    return
+  }
 
   await loadImage(inputMapImg)
 
@@ -74,8 +87,24 @@ async function displayProjection() {
   const dxLatRange = step.value
   const dxLonRange = step.value
 
+
+  let samplesTotal = Math.floor((maxLatRange - minLatRange) / dxLatRange) * Math.floor((maxLonRange - minLonRange) / dxLonRange)
+  let samplesCollected = 0;
+  totalProjectedSamples.value = 0
   for (let lat = minLatRange; lat < maxLatRange; lat += dxLatRange) {
+    if (processId.value !== currentProcessId) {
+      return
+    }
     for (let lon = minLonRange; lon < maxLonRange; lon += dxLonRange) {
+      samplesCollected += 1;
+      if (samplesCollected % 1000 == 0) {
+        if (processId.value !== currentProcessId) {
+          // If the processId has changed, stop running this process.
+          return
+        }
+        progress.value = samplesCollected / samplesTotal
+        await waitForAnimationFrame()
+      }
       const value = transformer.forward([lon,lat])
       if (!Number.isFinite(value[0]) || Number.isNaN(value[0]) || !Number.isFinite(value[1]) || Number.isNaN(value[1])) {
         continue
@@ -91,14 +120,16 @@ async function displayProjection() {
       ).data)
     }
   }
+  totalProjectedSamples.value = validLons.length
+  progress.value = 1
 
-  if (xValues.length == 0) {
-    console.log('No values projected')
+  if (processId.value !== currentProcessId) {
     return
   }
 
-  const projectedCoordinatesContainer = document.getElementById("myCanvas") as HTMLDivElement|null;
-  if (projectedCoordinatesContainer === null) {
+  if (xValues.length == 0) {
+    projectedCoordinatesContainer.textContent = ''
+    validCoordinatesContainer.textContent = ''
     return
   }
 
@@ -113,10 +144,6 @@ async function displayProjection() {
   projectedCoordinatesCanvas.classList.add('h-full')
   projectedCoordinatesContainer.replaceChildren(projectedCoordinatesCanvas)
 
-  const validCoordinatesContainer = document.getElementById("myCanvas2") as HTMLDivElement|null;
-  if (validCoordinatesContainer === null) {
-    return
-  }
   const validCoordinatesCanvas = createValidCoordinatesCanvas(
       step.value,
       validLons,
@@ -131,16 +158,16 @@ async function displayProjection() {
   validCoordinatesContainer.replaceChildren(validCoordinatesCanvas)
 }
 
-const debouncedDisplayProjection = debounce(displayProjection, 500)
+const debouncedDisplayProjection = debounce(displayProjection, 100)
 
 onMounted(async () => {
   updateSelectedExampleValues()
-  await displayProjection()
+  debouncedDisplayProjection()
 })
 
 watch([selectedExample], async () => {
   updateSelectedExampleValues()
-  await displayProjection()
+  debouncedDisplayProjection()
 })
 
 watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], () => {
@@ -189,11 +216,19 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
           />
         </div>
       </div>
-      <div class="grid grid-cols-1 gap-y-2">
-        <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="myCanvas2">
+      <div class="grid grid-cols-1 gap-y-2 auto-rows-min">
+        <div>
+          <div class="w-full border-2 border-white h-6 bg-white">
+            <div class="bg-blue-500 h-full text-white" :style="{ width: `${progress * 100}%` }">
+              <div class="w-full h-full text-right px-2 whitespace-nowrap overflow-hidden" v-if="progress < 1">{{ Math.floor(progress * 100) }}%</div>
+              <div class="w-full text-center" v-if="progress === 1">{{ totalProjectedSamples.toLocaleString() }} samples projected</div>
+            </div>
+          </div>
         </div>
-        <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="myCanvas">
-        </div>
+        <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="validCoordinatesContainer"></div>
+        <div class="text-center">&nbsp;</div>
+        <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="projectedCoordinatesContainer"></div>
+        <div class="text-center">&nbsp;</div>
       </div>
     </article>
     <footer class="sm:p-10 text-center">
