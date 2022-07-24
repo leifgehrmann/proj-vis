@@ -19,7 +19,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:projection'])
 
-const valid = ref(false)
+const valid = ref(true)
 
 const projectionModel = computed({
   get() {
@@ -31,7 +31,11 @@ const projectionModel = computed({
 })
 
 watch(() => props.projection, (projection: string|undefined) => {
-  if (projection == undefined) {
+  if (projection === undefined) {
+    return
+  }
+  if (projection === '') {
+    valid.value = true
     return
   }
   try {
