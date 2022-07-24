@@ -37,8 +37,7 @@
         type="number"
         v-model="stepModel"
     >
-    <p class="my-2" :class="{invisible: false}">{{horizontalSamples.toLocaleString()}} × {{verticalSamples.toLocaleString()}} = {{totalSamples.toLocaleString()}} samples</p>
-    <!--            <p :class="{invisible: true}">Too many samples: 6,480,000 (3,600 × 1,800). <br>Maximum is 1,000,000 samples. </p>-->
+    <p class="my-2" :class="{invisible: false}">{{(horizontalSamples ?? 0).toLocaleString()}} × {{(verticalSamples ?? 0).toLocaleString()}} = {{(totalSamples ?? 0).toLocaleString()}} samples</p>
   </div>
   <div
       ref="worldMap"
@@ -52,7 +51,14 @@
     >
     <svg class="absolute top-0 left-0 w-full select-none pointer-events-none cursor-crosshair" viewBox="0 0 360 180">
       <g fill-rule="evenodd" fill="rgba(0, 0, 0, 0.4)" >
-        <path :d="`M0 0 H360 V180 H0z M${lonRangeMin + 180} ${90 - latRangeMax} V${90 - latRangeMin} H${lonRangeMax + 180} V${90 - latRangeMax} H${lonRangeMin + 180} z`"/>
+        <path :d="`
+        M0 0 H360 V180 H0z
+        M${(lonRangeMin ?? 0) + 180} ${90 - (latRangeMax ?? 0)}
+        V${90 - (latRangeMin ?? 0)}
+        H${(lonRangeMax ?? 0) + 180}
+        V${90 - (latRangeMax ?? 0)}
+        H${(lonRangeMin ?? 0) + 180}
+        z`"/>
       </g>
     </svg>
   </div>
