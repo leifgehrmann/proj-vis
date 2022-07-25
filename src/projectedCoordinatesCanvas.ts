@@ -1,10 +1,15 @@
 import {getBbox} from "./bbox";
+import {Coordinate} from "./coord";
 
-export function createProjectedCoordinatesCanvas(
+export function createProjectedCoordinatesCanvasAndTransformers(
   xValues: number[],
   yValues: number[],
   colorMap: Uint8ClampedArray[]
-): HTMLCanvasElement {
+): ({
+  canvas: HTMLCanvasElement,
+  toCanvas: (coord: Coordinate) => Coordinate
+  toCoords: (coord: Coordinate) => Coordinate
+}) {
   const bbox = getBbox(xValues, yValues)
   const dX = bbox.maxX - bbox.minX
   const dY = bbox.maxY - bbox.minY
@@ -27,13 +32,30 @@ export function createProjectedCoordinatesCanvas(
     throw new Error('Failed to get 2d context')
   }
 
+  const toCanvas = (coords: Coordinate): Coordinate => {
+    return {
+      x: (coords.x - bbox.minX) / (dX) * (rWidth - padding * 2) + padding,
+      y: (rHeight - padding * 2) - (coords.y - bbox.minY) / (dY) * (rHeight - padding * 2) + padding
+    }
+  }
+
+  const toCoords = (coords: Coordinate): Coordinate => {
+    return {
+      x: (coords.x - padding) / (rWidth - padding * 2) * dX + bbox.minX,
+      y: -(coords.y - padding - (rHeight - padding * 2)) / (rHeight - padding * 2) * dY + bbox.minY
+    }
+  }
+
   for (let i = 0; i < xValues.length; i++) {
-    const x = (xValues[i] - bbox.minX) / (dX) * (rWidth - padding * 2) + 1
-    const y = ((rHeight - padding * 2)-(yValues[i] - bbox.minY) / (dY) * (rHeight - padding * 2)) + 1
+    const {x, y} = toCanvas({x: xValues[i], y: yValues[i]})
     const color = colorMap[i]
     ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
     ctx.fillRect(x-1, y-1, 2, 2);
   }
 
-  return canvas
+  return {
+    canvas,
+    toCanvas,
+    toCoords
+  }
 }

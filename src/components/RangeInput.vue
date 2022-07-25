@@ -182,7 +182,10 @@ onMounted(() => {
     const mouseUpPosition = convertMousePositionToLatLon(worldMapElement, event)
 
     // If the values are the same on release, just reset the entire range.
-    if (mouseDownPosition.lat === mouseUpPosition.lat && mouseDownPosition.lon === mouseUpPosition.lon) {
+    if (
+        mouseDownPosition.lat === mouseUpPosition.lat &&
+        mouseDownPosition.lon === mouseUpPosition.lon
+    ) {
       latRangeMinModel.value = -90
       latRangeMaxModel.value = 90
       lonRangeMinModel.value = -180
@@ -197,9 +200,4 @@ onMounted(() => {
     lonRangeMaxModel.value = Math.max(mouseDownPosition.lon, mouseUpPosition.lon)
   })
 })
-
 </script>
-
-<style scoped>
-
-</style>

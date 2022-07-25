@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
-  progress: Number,
-  totalProjectedSamples: Number,
-})
+defineProps<{
+  progress: number,
+  totalProjectedSamples: number,
+}>()
 </script>
