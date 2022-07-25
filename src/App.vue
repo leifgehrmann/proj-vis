@@ -185,7 +185,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
     <header class="p-5">
       <h1 class="text-center font-black italic text-3xl">proj-vis</h1>
     </header>
-    <article class="px-2 grid grid-cols-1 gap-y-2 xl:grid-cols-2 xl:gap-x-2 xl:gap-y-0">
+    <article class="px-2 grid grid-cols-1 gap-y-2 lg:grid-cols-2 lg:gap-x-2 lg:gap-y-0">
       <div>
         <div class="grid grid-cols-2 auto-cols-max gap-y-2 gap-x-2" style="grid-template-columns: calc(30% - 0.5rem) 70%;">
           <div><label for="example">Example:</label></div>
