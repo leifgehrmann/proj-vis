@@ -13,7 +13,7 @@ import {isValidProjection} from "./isValidProjection";
 
 const projectionExamples = getProjectionExamples()
 const projectionExampleOptions = getProjectionExampleOptions()
-const selectedExample = ref(-1)
+const selectedExample = ref('ortho')
 let projection = ref('')
 let latRangeMin = ref(-90)
 let latRangeMax = ref(90)
