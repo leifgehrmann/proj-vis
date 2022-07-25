@@ -18,7 +18,7 @@
 <!--        }"-->
 <!--    ></div>-->
   </div>
-  <div class="text-center">&nbsp;</div>
+<!--  <div class="text-center">&nbsp;</div>-->
 </template>
 
 <script setup lang="ts">

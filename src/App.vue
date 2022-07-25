@@ -81,8 +81,16 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
 
 <template>
   <div class="container mx-auto text-white">
-    <header class="p-5">
-      <h1 class="text-center font-black italic text-3xl">proj-vis</h1>
+    <header class="px-2 py-5 lg:py-10">
+      <h1 class="text-center font-black italic text-3xl lg:text-7xl py-8 lg:py-16">proj-vis</h1>
+      <p class="mx-auto text-center py-4 lg:py-8 md:max-w-xl">
+        A simple web-app to visualize <a href="https://proj.org/operations/projections/index.html">PROJ coordinate operations</a>.
+      </p>
+      <p class="mx-auto text-sm md:max-w-2xl py-8">
+        Using the form below, enter a proj4 definition and select a range of coordinates to sample.
+        The individual coordinates will then be visualized on a canvas, along with a map of which points were successfully projected.
+        <span class="font-bold">Note:</span> For now the only projections that work are the ones supported by <a href="https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses">Proj4js</a>.
+      </p>
     </header>
     <article
       class="px-2 grid grid-cols-1 gap-y-2 lg:grid-cols-2 lg:gap-x-2 lg:gap-y-0"
@@ -113,24 +121,31 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
           :progress="progress"
           :total-projected-samples="totalProjectedSamples"
         />
+        <ProjectedCoordinates
+            :x-values="projectedXValues"
+            :y-values="projectedYValues"
+            :color-values="colorValues"
+            :marker-coordinate="markerProjectedCoordinate"
+        />
+        <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates
           :step="step"
           :lon-values="validLonValues"
           :lat-values="validLatValues"
           :color-values="colorValues"
         />
-        <ProjectedCoordinates
-          :x-values="projectedXValues"
-          :y-values="projectedYValues"
-          :color-values="colorValues"
-          :marker-coordinate="markerProjectedCoordinate"
-        />
       </div>
     </article>
-    <footer class="sm:p-10 text-center">
+    <footer class="py-10 text-center">
       <a href="https://github.com/leifgehrmann/proj-vis">
-        🐙 <span class="underline decoration-wavy">View project on GitHub.com</span>
+        <span>View project on GitHub.com</span>
       </a>
     </footer>
   </div>
 </template>
+
+<style scoped>
+a {
+  @apply underline decoration-white decoration-2 underline-offset-2 whitespace-nowrap hover:opacity-80;
+}
+</style>
