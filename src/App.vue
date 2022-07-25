@@ -26,7 +26,7 @@ let totalProjectedSamples = ref(0)
 
 function updateSelectedExampleValues() {
   let selectedExampleIndex = selectedExample.value
-  if (selectedExampleIndex === -1) {
+  if (selectedExampleIndex === '-1') {
     return
   }
   projection.value = projectionExamples[selectedExampleIndex].proj4
