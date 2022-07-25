@@ -8,6 +8,7 @@ import {createValidCoordinatesCanvas} from "./validCoordinatesCanvas";
 import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
 import ProjectionInput from "./components/ProjectionInput.vue";
 import RangeInput from "./components/RangeInput.vue";
+import ProgressBar from "./components/ProgressBar.vue";
 import {waitForAnimationFrame} from "./waitForAnimationFrame";
 import {isValidProjection} from "./isValidProjection";
 
@@ -228,12 +229,10 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
         </div>
       </div>
       <div class="grid grid-cols-1 gap-y-2 auto-rows-min" :class="{invisible: progress === 0}">
-        <div class="w-full border-2 border-white h-6 bg-white">
-          <div class="bg-blue-500 h-full text-white" :style="{ width: `${progress * 100}%` }">
-            <div class="w-full h-full text-right px-2 whitespace-nowrap overflow-hidden" v-if="progress < 1">{{ Math.floor(progress * 100) }}%</div>
-            <div class="w-full text-center" v-if="progress === 1">{{ totalProjectedSamples.toLocaleString() }} samples projected</div>
-          </div>
-        </div>
+        <ProgressBar
+          :progress="progress"
+          :total-projected-samples="totalProjectedSamples"
+        />
         <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="validCoordinatesContainer"></div>
         <div class="text-center">&nbsp;</div>
         <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="projectedCoordinatesContainer"></div>
