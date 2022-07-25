@@ -9,6 +9,7 @@ import {createProjectedCoordinatesCanvas} from "./projectedCoordinatesCanvas";
 import ProjectionInput from "./components/ProjectionInput.vue";
 import RangeInput from "./components/RangeInput.vue";
 import {waitForAnimationFrame} from "./waitForAnimationFrame";
+import {isValidProjection} from "./isValidProjection";
 
 const projectionExamples = getProjectionExamples()
 const projectionExampleOptions = getProjectionExampleOptions()
@@ -48,8 +49,6 @@ function loadImage(imgElement: HTMLImageElement): Promise<void> {
 }
 
 async function displayProjection() {
-  const currentProcessId = Date.now()
-  processId.value = currentProcessId
   const inputMapImg = document.querySelector('#inputMap') as HTMLImageElement;
   const projectedCoordinatesContainer = document.getElementById("projectedCoordinatesContainer") as HTMLDivElement|null;
   const validCoordinatesContainer = document.getElementById("validCoordinatesContainer") as HTMLDivElement|null;
@@ -92,9 +91,17 @@ async function displayProjection() {
     return
   }
 
+  if(!isValidProjection(projection.value)) {
+    console.error('Projection is invalid')
+    return
+  }
+
+  const currentProcessId = Date.now()
+  processId.value = currentProcessId
   let samplesTotal = Math.floor((maxLatRange - minLatRange) / dxLatRange) * Math.floor((maxLonRange - minLonRange) / dxLonRange)
   let samplesCollected = 0;
   totalProjectedSamples.value = 0
+
   for (let lat = minLatRange; lat < maxLatRange; lat += dxLatRange) {
     if (processId.value !== currentProcessId) {
       return
@@ -220,13 +227,11 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], ()
           />
         </div>
       </div>
-      <div class="grid grid-cols-1 gap-y-2 auto-rows-min">
-        <div>
-          <div class="w-full border-2 border-white h-6 bg-white">
-            <div class="bg-blue-500 h-full text-white" :style="{ width: `${progress * 100}%` }">
-              <div class="w-full h-full text-right px-2 whitespace-nowrap overflow-hidden" v-if="progress < 1">{{ Math.floor(progress * 100) }}%</div>
-              <div class="w-full text-center" v-if="progress === 1">{{ totalProjectedSamples.toLocaleString() }} samples projected</div>
-            </div>
+      <div class="grid grid-cols-1 gap-y-2 auto-rows-min" :class="{invisible: progress === 0}">
+        <div class="w-full border-2 border-white h-6 bg-white">
+          <div class="bg-blue-500 h-full text-white" :style="{ width: `${progress * 100}%` }">
+            <div class="w-full h-full text-right px-2 whitespace-nowrap overflow-hidden" v-if="progress < 1">{{ Math.floor(progress * 100) }}%</div>
+            <div class="w-full text-center" v-if="progress === 1">{{ totalProjectedSamples.toLocaleString() }} samples projected</div>
           </div>
         </div>
         <div class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96" id="validCoordinatesContainer"></div>

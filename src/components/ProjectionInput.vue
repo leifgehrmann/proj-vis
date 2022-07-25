@@ -13,6 +13,7 @@
 
 import {ref, watch, computed} from "vue";
 import proj4 from "proj4";
+import {isValidProjection} from "../isValidProjection";
 
 const props = defineProps({
   projection: String,
@@ -38,13 +39,7 @@ watch(() => props.projection, (projection: string|undefined) => {
     valid.value = true
     return
   }
-  try {
-    const transformer = proj4(projection)
-    transformer.forward([0, 0])
-    valid.value = true
-  } catch (e) {
-    valid.value = false
-  }
+  valid.value = isValidProjection(projection)
 })
 
 </script>
