@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "proj-vis-server-build": "cd proj-vis-server; docker build . -t proj-vis-server",
+    "proj-vis-server-run": "docker run --rm -p 7765:7765 proj-vis-server"
   },
   "dependencies": {
     "proj4": "^2.8.0",
