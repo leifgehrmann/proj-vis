@@ -10,7 +10,9 @@ import ProjectedCoordinates from "./components/ProjectedCoordinates.vue";
 import ValidCoordinates from "./components/ValidCoordinates.vue";
 import ExampleSelector from "./components/ExampleSelector.vue";
 import {computeProjection} from "./computeProjection";
+import {getProjVisServerUrl} from "./definedVars";
 
+let projVisServerUrl = ref(getProjVisServerUrl())
 const projectionExamples = getProjectionExamples()
 const selectedExample = ref('ortho')
 let projection = ref('')
