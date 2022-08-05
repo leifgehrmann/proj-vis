@@ -89,6 +89,7 @@ class ProjVisServer(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         coordinates_json = json.dumps(coordinates)
         self.wfile.write(bytes('%s' % coordinates_json, "utf-8"))
