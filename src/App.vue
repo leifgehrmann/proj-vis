@@ -46,6 +46,7 @@ function updateSelectedExampleValues() {
 
 async function displayProjection() {
   await computeProjection(
+    projVisServerUrl,
     projection,
     latRangeMin,
     latRangeMax,
