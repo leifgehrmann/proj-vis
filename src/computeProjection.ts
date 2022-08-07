@@ -247,8 +247,6 @@ async function generateRemoteBatch(
   offset: number,
   limit: number
 ): Promise<ProjectedCoordinates> {
-  await waitForAnimationFrame()
-
   const urlWithParams = new URL(url)
 
   urlWithParams.searchParams.append('proj', proj)
