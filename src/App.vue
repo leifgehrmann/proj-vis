@@ -25,6 +25,7 @@ let processId = ref(0)
 let progress = ref(0)
 let totalProjectedSamples = ref(0)
 let markerProjectedCoordinate = ref(undefined)
+let validStep = ref(1)
 let validLonValues = ref([])
 let validLatValues = ref([])
 let projectedXValues = ref([])
@@ -56,6 +57,7 @@ async function displayProjection() {
     processId,
     totalProjectedSamples,
     progress,
+    validStep,
     validLonValues,
     validLatValues,
     projectedXValues,
@@ -132,7 +134,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
         />
         <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates
-          :step="step"
+          :step="validStep"
           :lon-values="validLonValues"
           :lat-values="validLatValues"
           :color-values="colorValues"

@@ -21,6 +21,7 @@ export async function computeProjection(
   processId: Ref<number>,
   totalProjectedSamples: Ref<number>,
   progress: Ref<number>,
+  validStep: Ref<number>,
   validLonValues: Ref<number[]>,
   validLatValues: Ref<number[]>,
   projectedXValues: Ref<number[]>,
@@ -155,6 +156,7 @@ export async function computeProjection(
     return
   }
 
+  validStep.value = step.value
   validLonValues.value = validLons
   validLatValues.value = validLats
   projectedXValues.value = xValues
