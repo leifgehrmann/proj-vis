@@ -116,7 +116,7 @@ const horizontalSamples = computed(() => {
   ) {
     return undefined
   }
-  return Math.floor((lonRangeMaxModel.value - lonRangeMinModel.value) / stepModel.value)
+  return Math.floor((lonRangeMaxModel.value - lonRangeMinModel.value) / stepModel.value) + 1
 })
 
 const verticalSamples = computed(() => {
@@ -127,7 +127,7 @@ const verticalSamples = computed(() => {
   ) {
     return undefined
   }
-  return Math.floor((latRangeMaxModel.value - latRangeMinModel.value) / stepModel.value)
+  return Math.floor((latRangeMaxModel.value - latRangeMinModel.value) / stepModel.value) + 1
 })
 
 const totalSamples = computed(() => {

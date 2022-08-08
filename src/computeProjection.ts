@@ -76,7 +76,9 @@ export async function computeProjection(
 
   const currentProcessId = Date.now()
   processId.value = currentProcessId
-  let samplesTotal = Math.floor((maxLatRange - minLatRange) / dxLatRange) * Math.floor((maxLonRange - minLonRange) / dxLonRange)
+  let samplesTotalWidth = Math.floor((maxLatRange - minLatRange) / dxLatRange) + 1
+  let samplesTotalHeight = Math.floor((maxLonRange - minLonRange) / dxLonRange) + 1
+  let samplesTotal = samplesTotalWidth * samplesTotalHeight
   let samplesCollected = 0;
   totalProjectedSamples.value = 0
 
@@ -174,9 +176,9 @@ function generateWgs84Coordinates(
   limit: number
 ): Wgs84Coordinates {
   const lonRange = maxLon - minLon
-  const lonCount = Math.floor(lonRange / step)
+  const lonCount = Math.floor(lonRange / step) + 1
 
-  let lon = minLon + offset % lonCount * step
+  let lon = minLon + (offset % lonCount) * step
   let lat = minLat + Math.floor(offset / lonCount) * step
 
   let count = 0
