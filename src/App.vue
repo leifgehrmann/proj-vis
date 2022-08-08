@@ -108,7 +108,10 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
           <ExampleSelector
             v-model:selected-example="selectedExample"
           />
-          <ProjectionInput v-model:projection="projection" />
+          <ProjectionInput
+            v-model:projection="projection"
+            :proj-vis-server-url="projVisServerUrl"
+          />
           <RangeInput
               v-model:lat-range-min="latRangeMin"
               v-model:lat-range-max="latRangeMax"
