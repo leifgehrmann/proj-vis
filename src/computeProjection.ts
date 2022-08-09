@@ -69,7 +69,7 @@ export async function computeProjection(
     return
   }
 
-  if(!isValidProjection(projection.value) && projVisServerUrl.value === null) {
+  if(!(await isValidProjection(projection.value, projVisServerUrl.value)).valid) {
     console.error('Projection is invalid')
     return
   }
@@ -190,7 +190,7 @@ function generateWgs84Coordinates(
       wgs84Coordinates.push([lon, lat])
 
       count += 1
-      if (count >= limit) {
+      if (count === limit) {
         return wgs84Coordinates
       }
 
@@ -251,11 +251,11 @@ async function generateRemoteBatch(
 ): Promise<ProjectedCoordinates> {
   const urlWithParams = new URL(url)
 
-  urlWithParams.searchParams.append('proj', proj)
-  urlWithParams.searchParams.append('minLat', minLat.toString())
-  urlWithParams.searchParams.append('maxLat', maxLat.toString())
-  urlWithParams.searchParams.append('minLon', minLon.toString())
-  urlWithParams.searchParams.append('maxLon', maxLon.toString())
+  urlWithParams.searchParams.append('projTo', proj)
+  urlWithParams.searchParams.append('minX', minLon.toString())
+  urlWithParams.searchParams.append('maxX', maxLon.toString())
+  urlWithParams.searchParams.append('minY', minLat.toString())
+  urlWithParams.searchParams.append('maxY', maxLat.toString())
   urlWithParams.searchParams.append('step', step.toString())
   urlWithParams.searchParams.append('offset', offset.toString())
   urlWithParams.searchParams.append('limit', limit.toString())
