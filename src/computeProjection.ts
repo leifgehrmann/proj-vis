@@ -76,8 +76,12 @@ export async function computeProjection(
 
   const currentProcessId = Date.now()
   processId.value = currentProcessId
-  let samplesTotalWidth = Math.floor((maxLatRange - minLatRange) / dxLatRange) + 1
-  let samplesTotalHeight = Math.floor((maxLonRange - minLonRange) / dxLonRange) + 1
+  // To mitigate against floating-point precision errors, we multiply the values
+  // by a scale factor and then un-multiply them.
+  let scale = 1000000
+  let samplesTotalWidth = Math.floor((maxLatRange * scale - minLatRange * scale) / dxLatRange / scale) + 1
+  let samplesTotalHeight = Math.floor((maxLonRange * scale - minLonRange * scale) / dxLonRange / scale) + 1
+  console.log(samplesTotalWidth, samplesTotalHeight)
   let samplesTotal = samplesTotalWidth * samplesTotalHeight
   let samplesCollected = 0;
   totalProjectedSamples.value = 0
@@ -130,6 +134,9 @@ export async function computeProjection(
     samplesCollected += limit;
     progress.value = samplesCollected / samplesTotal
 
+    console.log(wgs84Coordinates.length)
+    console.log(projectedCoordinates.length)
+
     for (let index = 0; index < projectedCoordinates.length; index++) {
       const [lon, lat] = wgs84Coordinates[index]
       const [x, y] = projectedCoordinates[index]
@@ -175,29 +182,30 @@ function generateWgs84Coordinates(
   offset: number,
   limit: number
 ): Wgs84Coordinates {
-  const lonRange = maxLon - minLon
-  const lonCount = Math.floor(lonRange / step) + 1
+  // To mitigate against floating-point precision errors, we multiply the values
+  // by a scale factor and then un-multiply them.
+  let scale = 1000000
+  const lonRange = maxLon * scale - minLon * scale
+  const latRange = maxLat * scale - minLat * scale
+  const lonCount = Math.floor(lonRange / step / scale) + 1
+  const latCount = Math.floor(latRange / step / scale) + 1
 
-  let lon = minLon + (offset % lonCount) * step
-  let lat = minLat + Math.floor(offset / lonCount) * step
-
+  let pos = offset
   let count = 0
 
   let wgs84Coordinates: [number, number][] = []
 
-  while (lat < maxLat) {
-    while (lon < maxLon) {
-      wgs84Coordinates.push([lon, lat])
+  while (pos < lonCount * latCount) {
+    let lon = minLon + (pos % lonCount) * step
+    let lat = minLat + Math.floor(pos / lonCount) * step
+    wgs84Coordinates.push([lon, lat])
 
-      count += 1
-      if (count === limit) {
-        return wgs84Coordinates
-      }
-
-      lon += step
+    count += 1
+    if (count === limit) {
+      return wgs84Coordinates
     }
-    lon = minLon
-    lat += step
+
+    pos += 1
   }
 
   return wgs84Coordinates

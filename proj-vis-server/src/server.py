@@ -19,30 +19,32 @@ def generate_coordinates(
     offset: int,
     limit: int
 ) -> List[Tuple[float, float]]:
-    x_range = max_x - min_x
-    x_count = math.floor(x_range / step) + 1
+    # To mitigate against floating-point precision errors, we multiply the
+    # values by a scale factor and then un-multiply them.
+    scale = 1000000
+    x_range = max_x * scale - min_x * scale
+    y_range = max_y * scale - min_y * scale
+    x_count = math.floor(x_range / step / scale) + 1
+    y_count = math.floor(y_range / step / scale) + 1
 
-    x = min_x + (offset % x_count) * step
-    y = min_y + math.floor(offset / x_count) * step
-
+    pos = offset
     count = 0
 
     points = []
 
-    while y < max_y:
-        while x < max_x:
-            point = transformer.transform(x, y)
-            if point[0] == float('inf') or point[1] == float('inf'):
-                points.append([None, None])
-            else:
-                points.append(point)
+    while pos < x_count * y_count:
+        x = min_x + (pos % x_count) * step
+        y = min_y + math.floor(((pos * scale) / x_count) / scale) * step
+        point = transformer.transform(x, y)
+        if point[0] == float('inf') or point[1] == float('inf'):
+            points.append((None, None))
+        else:
+            points.append(point)
 
-            count += 1
-            if count == limit:
-                return points
-            x += step
-        x = min_x
-        y += step
+        count += 1
+        if count == limit:
+            return points
+        pos += 1
 
     return points
 
