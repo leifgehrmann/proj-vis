@@ -81,7 +81,7 @@ export async function computeProjection(
   let scale = 1000000
   let samplesTotalWidth = Math.floor((maxLatRange * scale - minLatRange * scale) / dxLatRange / scale) + 1
   let samplesTotalHeight = Math.floor((maxLonRange * scale - minLonRange * scale) / dxLonRange / scale) + 1
-  console.log(samplesTotalWidth, samplesTotalHeight)
+
   let samplesTotal = samplesTotalWidth * samplesTotalHeight
   let samplesCollected = 0;
   totalProjectedSamples.value = 0
@@ -133,9 +133,6 @@ export async function computeProjection(
     offset += limit
     samplesCollected += limit;
     progress.value = samplesCollected / samplesTotal
-
-    console.log(wgs84Coordinates.length)
-    console.log(projectedCoordinates.length)
 
     for (let index = 0; index < projectedCoordinates.length; index++) {
       const [lon, lat] = wgs84Coordinates[index]
