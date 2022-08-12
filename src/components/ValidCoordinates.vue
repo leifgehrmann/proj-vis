@@ -1,7 +1,7 @@
 <template>
   <div
     ref="container"
-    class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96"
+    class="border-2 p-2 border-white w-full bg-black min-h-[8rem] max-h-96 cursor-crosshair"
   ></div>
   <div class="text-center">&nbsp;</div>
 </template>

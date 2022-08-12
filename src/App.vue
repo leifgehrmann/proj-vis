@@ -25,6 +25,7 @@ let processId = ref(0)
 let progress = ref(0)
 let totalProjectedSamples = ref(0)
 let markerProjectedCoordinate = ref(undefined)
+let validStep = ref(1)
 let validLonValues = ref([])
 let validLatValues = ref([])
 let projectedXValues = ref([])
@@ -46,6 +47,7 @@ function updateSelectedExampleValues() {
 
 async function displayProjection() {
   await computeProjection(
+    projVisServerUrl,
     projection,
     latRangeMin,
     latRangeMax,
@@ -55,6 +57,7 @@ async function displayProjection() {
     processId,
     totalProjectedSamples,
     progress,
+    validStep,
     validLonValues,
     validLatValues,
     projectedXValues,
@@ -105,7 +108,10 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
           <ExampleSelector
             v-model:selected-example="selectedExample"
           />
-          <ProjectionInput v-model:projection="projection" />
+          <ProjectionInput
+            v-model:projection="projection"
+            :proj-vis-server-url="projVisServerUrl"
+          />
           <RangeInput
               v-model:lat-range-min="latRangeMin"
               v-model:lat-range-max="latRangeMax"
@@ -131,7 +137,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
         />
         <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates
-          :step="step"
+          :step="validStep"
           :lon-values="validLonValues"
           :lat-values="validLatValues"
           :color-values="colorValues"

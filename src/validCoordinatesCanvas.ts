@@ -10,8 +10,8 @@ export function createValidCoordinatesCanvas(
   const validLonsDelta = bbox.maxX - bbox.minX
   const validLatsDelta = bbox.maxY - bbox.minY
   const canvas = document.createElement('canvas');
-  canvas.width = validLonsDelta / fullRangeStep
-  canvas.height = validLatsDelta / fullRangeStep
+  canvas.width = validLonsDelta / fullRangeStep + 1
+  canvas.height = validLatsDelta / fullRangeStep + 1
 
   const ctx = canvas.getContext('2d');
   if (ctx == null) {

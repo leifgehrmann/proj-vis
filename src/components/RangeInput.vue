@@ -116,7 +116,10 @@ const horizontalSamples = computed(() => {
   ) {
     return undefined
   }
-  return Math.floor((lonRangeMaxModel.value - lonRangeMinModel.value) / stepModel.value)
+  // To mitigate against floating-point precision errors, we multiply the values
+  // by a scale factor and then un-multiply them.
+  let scale = 1000000
+  return Math.floor((lonRangeMaxModel.value * scale - lonRangeMinModel.value * scale) / stepModel.value / scale) + 1
 })
 
 const verticalSamples = computed(() => {
@@ -127,7 +130,10 @@ const verticalSamples = computed(() => {
   ) {
     return undefined
   }
-  return Math.floor((latRangeMaxModel.value - latRangeMinModel.value) / stepModel.value)
+  // To mitigate against floating-point precision errors, we multiply the values
+  // by a scale factor and then un-multiply them.
+  let scale = 1000000
+  return Math.floor((latRangeMaxModel.value * scale - latRangeMinModel.value * scale) / stepModel.value / scale) + 1
 })
 
 const totalSamples = computed(() => {

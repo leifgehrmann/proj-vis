@@ -10,20 +10,26 @@
         autocomplete="off"
         v-model="projectionModel"
     ></textarea>
-    <p :class="{invisible: valid}">Invalid projection.</p>
+    <p :class="{invisible: valid}">
+      <span v-if="validMessage === null">Invalid projection.</span>
+      <span v-else>Error: {{ validMessage }}</span>
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import {ref, watch, computed} from "vue";
 import {isValidProjection} from "../isValidProjection";
+import {debounce} from "../debounce";
 
-const props = defineProps({
-  projection: String,
-})
+const props = defineProps<{
+  projection: string,
+  projVisServerUrl: string|null,
+}>()
 const emit = defineEmits(['update:projection'])
 
 const valid = ref(true)
+const validMessage = ref(null as string|null)
 
 const projectionModel = computed({
   get() {
@@ -34,14 +40,20 @@ const projectionModel = computed({
   }
 })
 
-watch(() => props.projection, (projection: string|undefined) => {
-  if (projection === undefined) {
-    return
+const debouncedValidation = debounce(async (projection: string, projVisServerUrl: string|null) => {
+  const validationResult = await isValidProjection(projection, projVisServerUrl)
+  valid.value = validationResult.valid
+  validMessage.value = validationResult.message
+}, 100)
+
+watch(
+  () => [props.projection, props.projVisServerUrl],
+  async ([projection, projVisServerUrl]) => {
+    if (projection === null || projection === '') {
+      valid.value = true
+      return
+    }
+    await debouncedValidation(projection, projVisServerUrl)
   }
-  if (projection === '') {
-    valid.value = true
-    return
-  }
-  valid.value = isValidProjection(projection)
-})
+)
 </script>
