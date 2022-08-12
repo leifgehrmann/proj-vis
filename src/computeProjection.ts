@@ -27,7 +27,7 @@ export async function computeProjection(
   projectedXValues: Ref<number[]>,
   projectedYValues: Ref<number[]>,
   colorValues: Ref<Uint8ClampedArray[]>,
-) {
+): Promise<void> {
   // This is a hacky way of getting the contents of the image in `RangeInput.vue`.
   // I know, it's not pretty, but proj-vis isn't meant to be an example good code,
   // just a quick hacky tool.
