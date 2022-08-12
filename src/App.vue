@@ -12,7 +12,7 @@ import ExampleSelector from "./components/ExampleSelector.vue";
 import {computeProjection} from "./computeProjection";
 import {getProjVisServerUrl} from "./definedVars";
 
-let projVisServerUrl = ref(getProjVisServerUrl())
+let remoteUrl = ref(getProjVisServerUrl())
 const projectionExamples = getProjectionExamples()
 const selectedExample = ref('ortho')
 let projection = ref('')
@@ -47,7 +47,7 @@ function updateSelectedExampleValues() {
 
 async function displayProjection() {
   await computeProjection(
-    projVisServerUrl,
+    remoteUrl,
     projection,
     latRangeMin,
     latRangeMax,
@@ -89,12 +89,15 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
     <header class="px-2 py-5 lg:py-10">
       <h1 class="text-center font-black italic text-3xl lg:text-7xl py-8 lg:py-16">proj-vis</h1>
       <p class="mx-auto text-center py-4 lg:py-8 md:max-w-xl">
-        A simple web-app to visualize <a href="https://proj.org/operations/projections/index.html">PROJ coordinate operations</a>.
+        A simple web-app to visualize map projections.
       </p>
       <p class="mx-auto text-sm md:max-w-2xl py-8">
-        Using the form below, enter a proj4 definition and select a range of coordinates to sample.
+        Using the form below, enter a "<a href="https://proj.org/usage/quickstart.html">proj-string</a>" and select a
+        range of coordinates to sample.
         The individual coordinates will then be visualized on a canvas, along with a map of which points were successfully projected.
-        <span class="font-bold">Note:</span> For now the only projections that work are the ones supported by <a href="https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses">Proj4js</a>.
+        <span v-if="remoteUrl===null">
+          <span class="font-bold">Note:</span> For now the only projections that work are the ones supported by <a href="https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses">Proj4js</a>.
+        </span>
       </p>
     </header>
     <article
@@ -110,7 +113,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
           />
           <ProjectionInput
             v-model:projection="projection"
-            :proj-vis-server-url="projVisServerUrl"
+            :remote-url="remoteUrl"
           />
           <RangeInput
               v-model:lat-range-min="latRangeMin"

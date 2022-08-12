@@ -1,6 +1,7 @@
 <template>
   <div>
-    <label for="projection">Proj4:</label>
+    <label v-if="isRemote" for="projection">Proj:</label>
+    <label v-else for="projection">Proj4:</label>
   </div>
   <div>
     <textarea
@@ -24,7 +25,7 @@ import {debounce} from "../debounce";
 
 const props = defineProps<{
   projection: string,
-  projVisServerUrl: string|null,
+  remoteUrl: string|null,
 }>()
 const emit = defineEmits(['update:projection'])
 
@@ -40,20 +41,24 @@ const projectionModel = computed({
   }
 })
 
-const debouncedValidation = debounce(async (projection: string, projVisServerUrl: string|null) => {
-  const validationResult = await isValidProjection(projection, projVisServerUrl)
+const isRemote = computed(() => {
+  return props.remoteUrl !== null
+})
+
+const debouncedValidation = debounce(async (projection: string, remoteUrl: string|null) => {
+  const validationResult = await isValidProjection(projection, remoteUrl)
   valid.value = validationResult.valid
   validMessage.value = validationResult.message
 }, 100)
 
 watch(
-  () => [props.projection, props.projVisServerUrl],
-  async ([projection, projVisServerUrl]) => {
+  () => [props.projection, props.remoteUrl],
+  async ([projection, remoteUrl]) => {
     if (projection === null || projection === '') {
       valid.value = true
       return
     }
-    await debouncedValidation(projection, projVisServerUrl)
+    await debouncedValidation(projection, remoteUrl)
   }
 )
 </script>

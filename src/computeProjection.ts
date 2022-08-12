@@ -11,7 +11,7 @@ type ProjectedCoordinates = [number|null, number|null][]
 // way to get stuff to be reactive without too much effort. Not recommended for
 // prod!
 export async function computeProjection(
-  projVisServerUrl: Ref<string|null>,
+  remoteUrl: Ref<string|null>,
   projection: Ref<string>,
   latRangeMin: Ref<number>,
   latRangeMax: Ref<number>,
@@ -46,7 +46,7 @@ export async function computeProjection(
   inputMapCtx.drawImage(inputMapImg, 0, 0);
 
   let transformer
-  if (projVisServerUrl.value === null) {
+  if (remoteUrl.value === null) {
     transformer = proj4(projection.value);
   } else {
     transformer = proj4('+proj=longlat');
@@ -69,7 +69,7 @@ export async function computeProjection(
     return
   }
 
-  if(!(await isValidProjection(projection.value, projVisServerUrl.value)).valid) {
+  if(!(await isValidProjection(projection.value, remoteUrl.value)).valid) {
     console.error('Projection is invalid')
     return
   }
@@ -105,7 +105,7 @@ export async function computeProjection(
     )
 
     let projectedCoordinates
-    if (projVisServerUrl.value === null) {
+    if (remoteUrl.value === null) {
       projectedCoordinates = await generateLocalBatch(
         transformer,
         minLatRange,
@@ -118,7 +118,7 @@ export async function computeProjection(
       )
     } else {
       projectedCoordinates = await generateRemoteBatch(
-        projVisServerUrl.value,
+        remoteUrl.value,
         projection.value,
         minLatRange,
         maxLatRange,

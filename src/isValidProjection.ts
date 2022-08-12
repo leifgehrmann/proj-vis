@@ -2,13 +2,13 @@ import proj4 from "proj4";
 
 export async function isValidProjection(
   projection: string,
-  projVisServerUrl: string|null
+  remoteUrl: string|null
 ): Promise<{ valid: boolean, message: string|null }> {
   try {
-    if (projVisServerUrl === null) {
+    if (remoteUrl === null) {
       localTest(projection)
     } else {
-      await remoteTest(projection, projVisServerUrl)
+      await remoteTest(projection, remoteUrl)
     }
     return {valid: true, message: null}
   } catch (e) {
@@ -21,8 +21,8 @@ function localTest(projection: string): void {
   transformer.forward([0, 0])
 }
 
-async function remoteTest(projection: string, projVisServerUrl: string): Promise<void> {
-  const urlWithParams = new URL(projVisServerUrl)
+async function remoteTest(projection: string, remoteUrl: string): Promise<void> {
+  const urlWithParams = new URL(remoteUrl)
 
   urlWithParams.searchParams.append('projTo', projection)
   urlWithParams.searchParams.append('x', '0')
