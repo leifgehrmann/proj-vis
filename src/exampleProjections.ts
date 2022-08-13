@@ -85,10 +85,10 @@ export function getProjectionExamples(): Record<string, Example> {
     'ortho': { ...fullBbox, label: 'Orthographic', proj4: '+proj=ortho +lat_0=30 +lon_0=-80 +x_0=0 +y_0=0'},
     'geos': { ...fullBbox, label: 'Geostationary Orbit', proj4: '+proj=geos +h=35785831.0 +lon_0=-60 +sweep=y' },
     'aeqd': { ...aeqdBbox, label: 'Azimuthal Equidistant', proj4:  '+proj=aeqd +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs'},
-    'laea': { ...fullBbox, label: 'Lambert Azimuthal Equal Area', proj4:  '+proj=laea +lat_0=42 +lon_0=15 +x_0=0 +y_0=0  +units=m +no_defs'},
+    'laea': { ...fullBbox, label: 'Lambert Azimuthal Equal Area', proj4:  '+proj=laea +lat_0=42 +lon_0=15 +x_0=0 +y_0=0  +units=m'},
     'qsc': { ...fullBbox, label: 'Quadrilateralized Spherical Cube', proj4:  '+proj=qsc +lon_0=0 +units=m +datum=WGS84'},
-    'stere': { ...stereBbox, label: 'Stereographic', proj4:  '+proj=stere +lat_0=-90 +lon_0=0 +x_0=0 +y_0=0 +a=3396000 +b=3396000 +units=m +no_defs'},
-    'sterea': { ...stereBbox, label: 'Oblique Stereographic Alternative', proj4:  '+proj=sterea +lat_0=-80 +lon_0=0 +x_0=0 +y_0=0 +a=3396000 +b=3396000 +units=m +no_defs'},
+    'stere': { ...stereBbox, label: 'Stereographic', proj4:  '+proj=stere +lat_0=-90 +lon_0=0 +x_0=0 +y_0=0 +units=m'},
+    'sterea': { ...stereBbox, label: 'Oblique Stereographic Alternative', proj4:  '+proj=sterea +lat_0=-80 +lon_0=0 +x_0=0 +y_0=0 +units=m'},
     'tpers': { ...fullBbox, label: 'Tilted Perspective', proj4: '+proj=tpers +lon_0=0 +a=6400000 +h=10000000 +azi=0 +tilt=0'},
     // Transverse and oblique cylindrical
     'cass': { ...fullBbox, label: 'Cassini (Cassini-Soldner)', proj4: '+proj=cass +lat_0=0 +lon_0=0 +x_0=0 +y_0=0'},
