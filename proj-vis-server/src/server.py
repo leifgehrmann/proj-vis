@@ -36,7 +36,8 @@ def generate_coordinates(
         x = min_x + (pos % x_count) * step
         y = min_y + math.floor(((pos * scale) / x_count) / scale) * step
         point = transformer.transform(x, y)
-        if point[0] == float('inf') or point[1] == float('inf'):
+        if point[0] == float('inf') or point[1] == float('inf') \
+            or point[0] == float('-inf') or point[1] == float('-inf'):
             points.append((None, None))
         else:
             points.append(point)
