@@ -97,6 +97,10 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
         The individual coordinates will then be visualized on a canvas, along with a map of which points were successfully projected.
         <span v-if="remoteUrl===null">
           <span class="font-bold">Note:</span> For now the only projections that work are the ones supported by <a href="https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses">Proj4js</a>.
+          To access the full list of projections, <a href="https://github.com/leifgehrmann/proj-vis#full-version">see these instructions</a>.
+        </span>
+        <span v-else>
+          See the <a href="https://proj.org/operations/projections/index.html">full list of projections</a> to create and configure your own projections.
         </span>
       </p>
     </header>

@@ -4,12 +4,45 @@
 
 You can find a demo at [proj-vis.leifgehrmann.com](https://proj-vis.leifgehrmann.com/).
 
----
+## PROJ vs PROJ4
 
-More specifically, map projections using the PROJ/PROJ.4 syntax can be visualised using proj-vis.
+There are two versions of the proj-vis app.
 
-* [Learn more about PROJ](https://en.wikipedia.org/wiki/PROJ) (Wikipedia)
-* [List of Projections on Proj.org](https://proj.org/operations/projections/index.html)
+The **demo version** only supports a limited number of projection classes because it uses
+[Proj4js](http://proj4js.org), a JavaScript port of the [proj](https://proj.org/) library. The port doesn't require a
+web server to transform the coordinates. The list of supported projections classes by alias names can be found [here](https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses).
 
-Unfortunately only a limited number of projection classes are supported because we use [Proj4js](http://proj4js.org).
-The list of supported projections classes by alias names can be found [here](https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses).
+The **full version** supports more projections but requires a web server to transform the coordinates. The server is a
+small Python script that uses the real proj library to do the transformations. Supported formats include:
+- PROJ string
+- JSON string with PROJ parameters
+- CRS WKT string
+- An authority string (e.g. `epsg:4326`)
+
+### Demo version
+
+The demo version requires npm to be installed.
+
+```
+npm ci
+npm run dev
+```
+
+### Full version
+
+The full version requires npm and docker to be installed.
+
+To start the server, run:
+
+```
+npm run proj-vis-server-build
+npm run proj-vis-server-run
+```
+
+In a new shell, run:
+
+```
+export PROJ_VIS_SERVER_URL='http://localhost:7765'
+npm ci
+npm run dev
+```
