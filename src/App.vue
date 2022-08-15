@@ -140,7 +140,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
             :x-values="projectedXValues"
             :y-values="projectedYValues"
             :color-values="colorValues"
-            :marker-coordinate="markerProjectedCoordinate"
+            v-model:marker-coordinate="markerProjectedCoordinate"
         />
         <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates

@@ -7,18 +7,18 @@
       id="projectedCoordinatesContainer"
       class="p-2 w-full h-full"
     ></div>
-<!--    <div-->
-<!--        ref="marker"-->
-<!--        v-if="markerCanvasPositionModel !== undefined"-->
-<!--        class="absolute bg-red-500 pointer-events-none"-->
-<!--        style="width: 5px; height: 5px"-->
-<!--        :style="{-->
-<!--          left: `calc(${(markerCanvasPositionModel.x ?? 0) * 100}% - 2.5px)`,-->
-<!--          top: `calc(${(markerCanvasPositionModel.y ?? 0) * 100}% - 2.5px)`-->
-<!--        }"-->
-<!--    ></div>-->
+    <div
+      ref="marker"
+      v-if="markerCoordinateModel !== undefined"
+      class="absolute bg-red-500 pointer-events-none"
+      style="width: 5px; height: 5px"
+      :style="{
+        left: `calc(${(markerCoordinateModel.x ?? 0) * 100}% - 2.5px)`,
+        top: `calc(${(markerCoordinateModel.y ?? 0) * 100}% - 2.5px)`
+      }"
+    ></div>
   </div>
-<!--  <div class="text-center">&nbsp;</div>-->
+  <div class="text-center">&nbsp;</div>
 </template>
 
 <script setup lang="ts">
@@ -42,21 +42,21 @@ const markerCoordinateModel = computed({
   set(markerCoordinate) { emit('update:markerCoordinate', markerCoordinate) }
 })
 
-// const markerCanvasPosition = computed(() => {
-//
-// })
-//
-// function convertMousePositionToMarkerCanvasPosition(
-//     container: HTMLDivElement,
-//     canvas: HTMLDivElement,
-//     event: MouseEvent
-// ): Coordinate {
-//   const canvasBounds = container.getBoundingClientRect()
-//   return {
-//     x: (event.clientX - canvasBounds.left) / canvasBounds.width,
-//     y: (event.clientY - canvasBounds.top) / canvasBounds.height
-//   }
-// }
+const markerCanvasPosition = computed(() => {
+
+})
+
+function convertMousePositionToMarkerCanvasPosition(
+    container: HTMLDivElement,
+    canvas: HTMLCanvasElement,
+    event: MouseEvent
+): Coordinate {
+  const canvasBounds = container.getBoundingClientRect()
+  return {
+    x: (event.clientX - canvasBounds.left) / canvasBounds.width,
+    y: (event.clientY - canvasBounds.top) / canvasBounds.height
+  }
+}
 
 watch(() => [props.xValues, props.yValues, props.colorValues], async ([xValues, yValues, colorValues]) => {
   const containerElement = container.value
@@ -84,21 +84,24 @@ watch(() => [props.xValues, props.yValues, props.colorValues], async ([xValues, 
 })
 
 onMounted(() => {
-  // const containerElement = container.value
-  // if (containerElement === null) {
-  //   return
-  // }
-  // containerElement.addEventListener('click', (event) => {
-  //   const canvasElements = containerElement.getElementsByTagName('canvas')
-  //   if (canvasElements.length !== 1) {
-  //     return
-  //   }
-  //   const canvasElement = canvasElements.item(0)
-  //   markerCanvasPositionModel.value = convertMousePositionToMarkerCanvasPosition(
-  //       containerElement,
-  //       canvasElement,
-  //       event
-  //   )
-  // })
+  const containerElement = container.value
+  if (containerElement === null) {
+    return
+  }
+  containerElement.addEventListener('click', (event) => {
+    const canvasElements = containerElement.getElementsByTagName('canvas')
+    if (canvasElements.length !== 1) {
+      return
+    }
+    const canvasElement = canvasElements.item(0)
+    if (canvasElement === null) {
+      return
+    }
+    markerCoordinateModel.value = convertMousePositionToMarkerCanvasPosition(
+        containerElement,
+        canvasElement,
+        event
+    )
+  })
 })
 </script>
