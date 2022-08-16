@@ -25,6 +25,7 @@
 import {computed, onMounted, ref, watch} from "vue";
 import {createProjectedCoordinatesCanvasAndTransformers} from "../projectedCoordinatesCanvas";
 import {Coordinate} from "../coord";
+import {getBbox} from "../bbox";
 
 const props = defineProps<{
   xValues: number[],
@@ -37,21 +38,38 @@ const emit = defineEmits(['update:markerCoordinate'])
 
 const container = ref<HTMLDivElement | null>(null)
 
+const bbox = computed(() => {
+  return getBbox(props.xValues, props.yValues)
+})
+
 const markerCoordinateModel = computed({
   get() { return props.markerCoordinate },
   set(markerCoordinate) { emit('update:markerCoordinate', markerCoordinate) }
 })
 
-const markerCanvasPosition = computed(() => {
-
-})
-
-function convertMousePositionToMarkerCanvasPosition(
+function convertMousePositionToCanvasPosition(
     container: HTMLDivElement,
     canvas: HTMLCanvasElement,
     event: MouseEvent
 ): Coordinate {
-  const canvasBounds = container.getBoundingClientRect()
+  const containerBounds = container.getBoundingClientRect()
+  return {
+    x: (event.clientX - containerBounds.left) / containerBounds.width,
+    y: (event.clientY - containerBounds.top) / containerBounds.height
+  }
+}
+
+function convertMousePositionToCoordinatePosition(
+    container: HTMLDivElement,
+    canvas: HTMLCanvasElement,
+    event: MouseEvent
+): Coordinate {
+  const padding = 1
+  const topLeftCoordinate = {
+    x: bbox.value.
+    y:
+  }
+  const canvasBounds = canvas.getBoundingClientRect()
   return {
     x: (event.clientX - canvasBounds.left) / canvasBounds.width,
     y: (event.clientY - canvasBounds.top) / canvasBounds.height
@@ -97,7 +115,7 @@ onMounted(() => {
     if (canvasElement === null) {
       return
     }
-    markerCoordinateModel.value = convertMousePositionToMarkerCanvasPosition(
+    markerCoordinateModel.value = convertMousePositionToCanvasPosition(
         containerElement,
         canvasElement,
         event
