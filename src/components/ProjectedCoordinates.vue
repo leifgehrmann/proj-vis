@@ -37,6 +37,10 @@ const props = defineProps<{
 const emit = defineEmits(['update:markerCoordinate'])
 
 const container = ref<HTMLDivElement | null>(null)
+const canvasToCoord = ref<((c: Coordinate) => Coordinate)|null>(null)
+const coordToCanvas = ref<((c: Coordinate) => Coordinate)|null>(null)
+const clientToCanvas = ref<((c: Coordinate) => Coordinate)|null>(null)
+const canvasToClient = ref<((c: Coordinate) => Coordinate)|null>(null)
 
 const bbox = computed(() => {
   return getBbox(props.xValues, props.yValues)
