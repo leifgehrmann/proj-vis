@@ -9,12 +9,12 @@
     ></div>
     <div
       ref="marker"
-      v-if="markerCoordinateModel !== undefined"
+      v-if="markerOffset !== undefined"
       class="absolute bg-red-500 pointer-events-none"
       style="width: 5px; height: 5px"
       :style="{
-        left: `calc(${(markerCoordinateModel.x ?? 0) * 100}% - 2.5px)`,
-        top: `calc(${(markerCoordinateModel.y ?? 0) * 100}% - 2.5px)`
+        left: `calc(${(markerOffset.x ?? 0) * 100}% - 2.5px)`,
+        top: `calc(${(markerOffset.y ?? 0) * 100}% - 2.5px)`
       }"
     ></div>
   </div>
@@ -46,6 +46,19 @@ const debug = ref<string>('')
 const markerCoordinateModel = computed({
   get() { return props.markerCoordinate },
   set(markerCoordinate) { emit('update:markerCoordinate', markerCoordinate) }
+})
+
+const markerOffset = computed(() => {
+  const coordinate = props.markerCoordinate
+  if (
+      coordinate === undefined ||
+      coordToCanvas.value === null ||
+      canvasToClient.value === null ||
+      clientToOffset.value === null
+  ) {
+    return undefined
+  }
+  return clientToOffset.value(canvasToClient.value(coordToCanvas.value(coordinate)))
 })
 
 watch(() => [props.xValues, props.yValues, props.colorValues], async ([xValues, yValues, colorValues]) => {
@@ -122,9 +135,8 @@ onMounted(() => {
     ) {
       return
     }
-    markerCoordinateModel.value = clientToOffset.value(
-        {x: event.clientX, y: event.clientY}
-    )
+
+    markerCoordinateModel.value = canvasToCoord.value(clientToCanvas.value({x: event.clientX, y: event.clientY}))
     debug.value = JSON.stringify(canvasToCoord.value(clientToCanvas.value({x: event.clientX, y: event.clientY})))
   })
 })
