@@ -18,7 +18,18 @@
       }"
     ></div>
   </div>
-  <div class="text-center">{{debug}}</div>
+  <div class="text-center">
+    <span
+      v-if="props.markerCoordinate !== undefined"
+      class="font-mono"
+    >
+      {{Math.round((props.markerCoordinate.x ?? 0) * 1000) / 1000}},
+      {{Math.round((props.markerCoordinate.y ?? 0) * 1000) / 1000}}
+    </span>
+    <span v-else>
+      &nbsp;
+    </span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -41,7 +52,6 @@ const coordToCanvas = ref<((c: Coordinate) => Coordinate)|null>(null)
 const clientToCanvas = ref<((c: Coordinate) => Coordinate)|null>(null)
 const canvasToClient = ref<((c: Coordinate) => Coordinate)|null>(null)
 const clientToOffset = ref<((c: Coordinate) => Coordinate)|null>(null)
-const debug = ref<string>('')
 
 const markerCoordinateModel = computed({
   get() { return props.markerCoordinate },
@@ -137,7 +147,6 @@ onMounted(() => {
     }
 
     markerCoordinateModel.value = canvasToCoord.value(clientToCanvas.value({x: event.clientX, y: event.clientY}))
-    debug.value = JSON.stringify(canvasToCoord.value(clientToCanvas.value({x: event.clientX, y: event.clientY})))
   })
 })
 </script>
