@@ -19,30 +19,32 @@ const props = defineProps<{
 
 const container = ref<HTMLDivElement | null>(null)
 
-watch(() => [props.step, props.lonValues, props.latValues, props.colorValues], async ([step, lonValues, latValues, colorValues]) => {
-  const containerElement = container.value
-  if (containerElement === null) {
-    return
-  }
+watch(
+  () => [props.step, props.lonValues, props.latValues, props.colorValues],
+  async ([step, lonValues, latValues, colorValues]) => {
+    const containerElement = container.value
+    if (containerElement === null) {
+      return
+    }
 
-  if ((lonValues as number[]).length === 0) {
-    containerElement.textContent = ''
-    return
-  }
+    if ((lonValues as number[]).length === 0) {
+      containerElement.textContent = ''
+      return
+    }
 
-  // Type definitions need to be declared because for some reason `watch` does not care about array order.
-  const canvas = createValidCoordinatesCanvas(
-      step as number,
-      lonValues as number[],
-      latValues as number[],
-      colorValues as Uint8ClampedArray[]
-  )
+    // Type definitions need to be declared because for some reason `watch` does not care about array order.
+    const canvas = createValidCoordinatesCanvas(
+        step as number,
+        lonValues as number[],
+        latValues as number[],
+        colorValues as Uint8ClampedArray[]
+    )
 
-  canvas.style.imageRendering = 'pixelated'
-  canvas.style.objectFit = 'contain'
-  canvas.classList.add('w-full')
-  canvas.classList.add('h-full')
+    canvas.style.imageRendering = 'pixelated'
+    canvas.style.objectFit = 'contain'
+    canvas.classList.add('w-full')
+    canvas.classList.add('h-full')
 
-  containerElement.replaceChildren(canvas)
-})
+    containerElement.replaceChildren(canvas)
+  })
 </script>
