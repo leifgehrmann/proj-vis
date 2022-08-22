@@ -3,6 +3,7 @@ import {isValidProjection} from "./isValidProjection";
 import {waitForAnimationFrame} from "./waitForAnimationFrame";
 import {loadImage} from "./loadImagePromise";
 import {Ref} from "vue";
+import {Coordinate} from "./coord";
 
 type Wgs84Coordinates = [number, number][]
 type ProjectedCoordinates = [number|null, number|null][]
@@ -168,6 +169,50 @@ export async function computeProjection(
   projectedXValues.value = xValues
   projectedYValues.value = yValues
   colorValues.value = inputMapColors
+}
+
+export async function computeProjectionForCoordinate(
+  remoteUrl: string|null,
+  projection: string,
+  coordinate: Coordinate,
+  reverse: boolean
+): Promise<Coordinate|null> {
+  let result: number[]|null[]
+  if (remoteUrl === null) {
+    const transformer = proj4(projection);
+    if (reverse) {
+      result = transformer.inverse([coordinate.x, coordinate.y])
+    } else {
+      result = transformer.forward([coordinate.x, coordinate.y])
+    }
+  } else {
+    const urlWithParams = new URL(remoteUrl)
+
+    if (reverse) {
+      urlWithParams.searchParams.append('projFrom', projection)
+      urlWithParams.searchParams.append('projTo', '+proj=longlat')
+    } else {
+      urlWithParams.searchParams.append('projFrom', '+proj=longlat')
+      urlWithParams.searchParams.append('projTo', projection)
+    }
+    urlWithParams.searchParams.append('x', coordinate.x.toString())
+    urlWithParams.searchParams.append('y', coordinate.y.toString())
+
+    result = await fetch(urlWithParams)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error('Failed to lookup coordinate');
+        }
+        const result = await response.json();
+        return result[0] as number[]|null[];
+      })
+  }
+
+  if (result[0] === null || result[1] === null) {
+    return null;
+  }
+
+  return { x: result[0], y: result[1] };
 }
 
 function generateWgs84Coordinates(

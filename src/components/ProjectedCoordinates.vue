@@ -4,7 +4,6 @@
   >
     <div
       ref="container"
-      id="projectedCoordinatesContainer"
       class="p-2 w-full h-full"
     ></div>
     <div

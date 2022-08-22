@@ -9,8 +9,9 @@ import ProgressBar from "./components/ProgressBar.vue";
 import ProjectedCoordinates from "./components/ProjectedCoordinates.vue";
 import ValidCoordinates from "./components/ValidCoordinates.vue";
 import ExampleSelector from "./components/ExampleSelector.vue";
-import {computeProjection} from "./computeProjection";
+import {computeProjection, computeProjectionForCoordinate} from "./computeProjection";
 import {getProjVisServerUrl} from "./definedVars";
+import {Coordinate} from "./coord";
 
 let remoteUrl = ref(getProjVisServerUrl())
 const projectionExamples = getProjectionExamples()
@@ -24,7 +25,8 @@ let step = ref(1)
 let processId = ref(0)
 let progress = ref(0)
 let totalProjectedSamples = ref(0)
-let markerProjectedCoordinate = ref(null)
+let markerProjectedCoordinate = ref(null as Coordinate|null)
+let markerValidCoordinate = ref(null as Coordinate|null)
 let validStep = ref(1)
 let validLonValues = ref([])
 let validLatValues = ref([])
@@ -81,6 +83,32 @@ watch([selectedExample], async () => {
 watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], async () => {
   await debouncedDisplayProjection()
 })
+
+async function updateProjectedCoordinate(newValidCoordinate: Coordinate|null) {
+  markerValidCoordinate.value = newValidCoordinate
+  if (markerValidCoordinate.value === null) {
+    return
+  }
+  markerProjectedCoordinate.value = await computeProjectionForCoordinate(
+      remoteUrl.value,
+      projection.value,
+      markerValidCoordinate.value,
+      false
+  )
+}
+
+async function updateValidCoordinate(newProjectedCoordinate: Coordinate|null) {
+  markerProjectedCoordinate.value = newProjectedCoordinate
+  if (markerProjectedCoordinate.value === null) {
+    return
+  }
+  markerValidCoordinate.value = await computeProjectionForCoordinate(
+      remoteUrl.value,
+      projection.value,
+      markerProjectedCoordinate.value,
+      true
+  )
+}
 
 </script>
 
@@ -141,6 +169,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
             :y-values="projectedYValues"
             :color-values="colorValues"
             v-model:marker-coordinate="markerProjectedCoordinate"
+            @update:marker-coordinate="updateValidCoordinate"
         />
         <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates
@@ -148,6 +177,8 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
           :lon-values="validLonValues"
           :lat-values="validLatValues"
           :color-values="colorValues"
+          v-model:marker-coordinate="markerValidCoordinate"
+          @update:marker-coordinate="updateProjectedCoordinate"
         />
       </div>
     </article>
