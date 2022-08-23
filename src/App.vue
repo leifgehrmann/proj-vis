@@ -84,7 +84,7 @@ watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], as
   await debouncedDisplayProjection()
 })
 
-async function updateProjectedCoordinate(newValidCoordinate: Coordinate|null) {
+async function updateValidCoordinate(newValidCoordinate: Coordinate|null) {
   markerValidCoordinate.value = newValidCoordinate
   if (markerValidCoordinate.value === null) {
     return
@@ -97,7 +97,7 @@ async function updateProjectedCoordinate(newValidCoordinate: Coordinate|null) {
   )
 }
 
-async function updateValidCoordinate(newProjectedCoordinate: Coordinate|null) {
+async function updateProjectedCoordinate(newProjectedCoordinate: Coordinate|null) {
   markerProjectedCoordinate.value = newProjectedCoordinate
   if (markerProjectedCoordinate.value === null) {
     return
@@ -168,8 +168,8 @@ async function updateValidCoordinate(newProjectedCoordinate: Coordinate|null) {
             :x-values="projectedXValues"
             :y-values="projectedYValues"
             :color-values="colorValues"
-            v-model:marker-coordinate="markerProjectedCoordinate"
-            @update:marker-coordinate="updateValidCoordinate"
+            :marker-coordinate="markerProjectedCoordinate"
+            @update:marker-coordinate="updateProjectedCoordinate"
         />
         <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates
@@ -177,12 +177,12 @@ async function updateValidCoordinate(newProjectedCoordinate: Coordinate|null) {
           :lon-values="validLonValues"
           :lat-values="validLatValues"
           :color-values="colorValues"
-          v-model:marker-coordinate="markerValidCoordinate"
-          @update:marker-coordinate="updateProjectedCoordinate"
+          :marker-coordinate="markerValidCoordinate"
+          @update:marker-coordinate="updateValidCoordinate"
         />
       </div>
     </article>
-    <footer class="py-10 text-center">
+    <footer class="py-32 text-center">
       <a href="https://github.com/leifgehrmann/proj-vis">
         <span>View project on GitHub.com</span>
       </a>
