@@ -25,15 +25,15 @@ export function createValidCoordinatesCanvas(
 
   const toCanvas = (coords: Coordinate): Coordinate => {
     return {
-      x: Math.round((coords.x - bbox.minX) / fullRangeStep),
-      y: Math.round(((bbox.maxY - bbox.minY) - (coords.y - bbox.minY)) / fullRangeStep)
+      x: (coords.x - bbox.minX) / fullRangeStep,
+      y: ((bbox.maxY - bbox.minY) - (coords.y - bbox.minY)) / fullRangeStep
     }
   }
 
   const toCoords = (coords: Coordinate): Coordinate => {
     return {
       x: coords.x * fullRangeStep + bbox.minX,
-      y: -(coords.y - (bbox.maxY - bbox.minY)) * fullRangeStep + bbox.minY
+      y: -(coords.y * fullRangeStep) + (bbox.maxY - bbox.minY) + bbox.minY
     }
   }
 
