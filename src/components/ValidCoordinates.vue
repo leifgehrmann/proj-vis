@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-2 border-white relative min-h-[8rem] max-h-96 cursor-crosshair bg-black"
+    class="border-2 border-white relative min-h-[8rem] max-h-96 cursor-crosshair bg-black overflow-hidden"
   >
     <div
       ref="container"
