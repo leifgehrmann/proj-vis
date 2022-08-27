@@ -1,10 +1,10 @@
-export function loadImage (imgElement: HTMLImageElement): Promise<void> {
+export default function loadImage(imgElement: HTMLImageElement): Promise<void> {
   return new Promise((resolve) => {
-    imgElement.onload = () => {
-      resolve()
-    }
+    imgElement.addEventListener('load', () => {
+      resolve();
+    });
     if (imgElement.complete) {
-      resolve()
+      resolve();
     }
-  })
+  });
 }

@@ -26,5 +26,5 @@
 defineProps<{
   progress: number,
   totalProjectedSamples: number,
-}>()
+}>();
 </script>

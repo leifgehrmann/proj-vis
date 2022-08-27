@@ -6,6 +6,7 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
+    "lint": "eslint . --ext .js,.ts,.vue",
     "proj-vis-server-build": "cd proj-vis-server; docker build . -t proj-vis-server",
     "proj-vis-server-run": "docker run --rm -p 7765:7765 proj-vis-server"
   },
@@ -15,10 +16,13 @@
   },
   "devDependencies": {
     "@babel/types": "^7.18.10",
+    "@rushstack/eslint-patch": "^1.1.4",
     "@types/node": "^18.7.1",
     "@types/proj4": "^2.5.2",
     "@vitejs/plugin-vue": "^3.0.2",
+    "@vue/eslint-config-airbnb-with-typescript": "^7.0.0",
     "autoprefixer": "^10.4.8",
+    "eslint": "^8.23.0",
     "postcss": "^8.4.16",
     "tailwindcss": "^3.1.8",
     "typescript": "^4.5.4",

@@ -1,113 +1,132 @@
 <script setup lang="ts">
-import './index.css'
-import {ref, onMounted, watch} from 'vue'
-import {getProjectionExamples} from "./exampleProjections";
-import {debounce} from "./debounce";
-import ProjectionInput from "./components/ProjectionInput.vue";
-import RangeInput from "./components/RangeInput.vue";
-import ProgressBar from "./components/ProgressBar.vue";
-import ProjectedCoordinates from "./components/ProjectedCoordinates.vue";
-import ValidCoordinates from "./components/ValidCoordinates.vue";
-import ExampleSelector from "./components/ExampleSelector.vue";
-import {computeProjection, computeProjectionForCoordinate} from "./computeProjection";
-import {getProjVisServerUrl} from "./definedVars";
-import {Coordinate} from "./coord";
+import './index.css';
+import {
+  ref, onMounted, watch,
+} from 'vue';
+import { getProjectionExamples } from './exampleProjections';
+import debounce from './debounce';
+import ProjectionInput from './components/ProjectionInput.vue';
+import RangeInput from './components/RangeInput.vue';
+import ProgressBar from './components/ProgressBar.vue';
+import ProjectedCoordinates from './components/ProjectedCoordinates.vue';
+import ValidCoordinates from './components/ValidCoordinates.vue';
+import ExampleSelector from './components/ExampleSelector.vue';
+import { computeProjection, computeProjectionForCoordinate } from './computeProjection';
+import getProjVisServerUrl from './definedVars';
+import { Coordinate } from './coord';
 
-let remoteUrl = ref(getProjVisServerUrl())
-const projectionExamples = getProjectionExamples()
-const selectedExample = ref('ortho')
-let projection = ref('')
-let latRangeMin = ref(-90)
-let latRangeMax = ref(90)
-let lonRangeMin = ref(-180)
-let lonRangeMax = ref(180)
-let step = ref(1)
-let processId = ref(0)
-let progress = ref(0)
-let totalProjectedSamples = ref(0)
-let markerProjectedCoordinate = ref(null as Coordinate|null)
-let markerValidCoordinate = ref(null as Coordinate|null)
-let validStep = ref(1)
-let validLonValues = ref([])
-let validLatValues = ref([])
-let projectedXValues = ref([])
-let projectedYValues = ref([])
-let colorValues = ref([])
+const remoteUrl = ref(getProjVisServerUrl());
+const projectionExamples = getProjectionExamples();
+const selectedExample = ref('ortho');
+const projection = ref('');
+const latRangeMin = ref(-90);
+const latRangeMax = ref(90);
+const lonRangeMin = ref(-180);
+const lonRangeMax = ref(180);
+const step = ref(1);
+const processId = ref(0);
+const progress = ref(0);
+const totalProjectedSamples = ref(0);
+const markerProjectedCoordinate = ref(null as Coordinate | null);
+const markerValidCoordinate = ref(null as Coordinate | null);
+const validStep = ref(1);
+const validLonValues = ref([] as number[]);
+const validLatValues = ref([] as number[]);
+const projectedXValues = ref([] as number[]);
+const projectedYValues = ref([] as number[]);
+const colorValues = ref([] as Uint8ClampedArray[]);
 
 function updateSelectedExampleValues() {
-  let selectedExampleIndex = selectedExample.value
+  const selectedExampleIndex = selectedExample.value;
   if (selectedExampleIndex === '-1') {
-    return
+    return;
   }
-  projection.value = projectionExamples[selectedExampleIndex].proj4
-  latRangeMin.value = projectionExamples[selectedExampleIndex].latRangeMin
-  latRangeMax.value = projectionExamples[selectedExampleIndex].latRangeMax
-  lonRangeMin.value = projectionExamples[selectedExampleIndex].lonRangeMin
-  lonRangeMax.value = projectionExamples[selectedExampleIndex].lonRangeMax
-  step.value = projectionExamples[selectedExampleIndex].step
+  projection.value = projectionExamples[selectedExampleIndex].proj4;
+  latRangeMin.value = projectionExamples[selectedExampleIndex].latRangeMin;
+  latRangeMax.value = projectionExamples[selectedExampleIndex].latRangeMax;
+  lonRangeMin.value = projectionExamples[selectedExampleIndex].lonRangeMin;
+  lonRangeMax.value = projectionExamples[selectedExampleIndex].lonRangeMax;
+  step.value = projectionExamples[selectedExampleIndex].step;
 }
 
 async function displayProjection() {
   await computeProjection(
-    remoteUrl,
-    projection,
-    latRangeMin,
-    latRangeMax,
-    lonRangeMin,
-    lonRangeMax,
-    step,
+    remoteUrl.value,
+    projection.value,
+    latRangeMin.value,
+    latRangeMax.value,
+    lonRangeMin.value,
+    lonRangeMax.value,
+    step.value,
     processId,
-    totalProjectedSamples,
-    progress,
-    validStep,
-    validLonValues,
-    validLatValues,
-    projectedXValues,
-    projectedYValues,
-    colorValues
-  )
+    (newProcessId) => {
+      processId.value = newProcessId;
+    },
+    (
+      newTotalProjectedSamples,
+      newProgress,
+    ) => {
+      totalProjectedSamples.value = newTotalProjectedSamples;
+      progress.value = newProgress;
+    },
+    (
+      newValidStep,
+      newValidLonValues,
+      newValidLatValues,
+      newProjectedXValues,
+      newProjectedYValues,
+      newColorValues,
+    ) => {
+      validStep.value = newValidStep;
+      validLonValues.value = newValidLonValues;
+      validLatValues.value = newValidLatValues;
+      projectedXValues.value = newProjectedXValues;
+      projectedYValues.value = newProjectedYValues;
+      colorValues.value = newColorValues;
+    },
+  );
 }
 
-const debouncedDisplayProjection = debounce(displayProjection, 100)
+const debouncedDisplayProjection = debounce(displayProjection, 100);
 
 onMounted(async () => {
-  updateSelectedExampleValues()
-  await debouncedDisplayProjection()
-})
+  updateSelectedExampleValues();
+  await debouncedDisplayProjection();
+});
 
 watch([selectedExample], async () => {
-  updateSelectedExampleValues()
-  await debouncedDisplayProjection()
-})
+  updateSelectedExampleValues();
+  await debouncedDisplayProjection();
+});
 
 watch([projection, latRangeMin, latRangeMax, lonRangeMin, lonRangeMax, step], async () => {
-  await debouncedDisplayProjection()
-})
+  await debouncedDisplayProjection();
+});
 
-async function updateValidCoordinate(newValidCoordinate: Coordinate|null) {
-  markerValidCoordinate.value = newValidCoordinate
+async function updateValidCoordinate(newValidCoordinate: Coordinate | null) {
+  markerValidCoordinate.value = newValidCoordinate;
   if (markerValidCoordinate.value === null) {
-    return
+    return;
   }
   markerProjectedCoordinate.value = await computeProjectionForCoordinate(
-      remoteUrl.value,
-      projection.value,
-      markerValidCoordinate.value,
-      false
-  )
+    remoteUrl.value,
+    projection.value,
+    markerValidCoordinate.value,
+    false,
+  );
 }
 
-async function updateProjectedCoordinate(newProjectedCoordinate: Coordinate|null) {
-  markerProjectedCoordinate.value = newProjectedCoordinate
+async function updateProjectedCoordinate(newProjectedCoordinate: Coordinate | null) {
+  markerProjectedCoordinate.value = newProjectedCoordinate;
   if (markerProjectedCoordinate.value === null) {
-    return
+    return;
   }
   markerValidCoordinate.value = await computeProjectionForCoordinate(
-      remoteUrl.value,
-      projection.value,
-      markerProjectedCoordinate.value,
-      true
-  )
+    remoteUrl.value,
+    projection.value,
+    markerProjectedCoordinate.value,
+    true,
+  );
 }
 
 </script>
@@ -122,8 +141,9 @@ async function updateProjectedCoordinate(newProjectedCoordinate: Coordinate|null
       <p class="mx-auto text-sm md:max-w-2xl py-8">
         Using the form below, enter a "<a href="https://proj.org/usage/quickstart.html">proj-string</a>" and select a
         range of coordinates to sample.
-        The individual coordinates will then be visualized on a canvas, along with a map of which points were successfully projected.
-        <span v-if="remoteUrl===null">
+        The individual coordinates will then be visualized on a canvas, along
+        with a map of which points were successfully projected.
+        <span v-if="remoteUrl === null">
           <span class="font-bold">Note:</span> For now the only projections that work are the ones supported by <a href="https://trac.osgeo.org/proj4js/wiki/UserGuide#Supportedprojectionclasses">Proj4js</a>.
           To access the full list of projections, <a href="https://github.com/leifgehrmann/proj-vis#full-version">see these instructions</a>.
         </span>
@@ -148,28 +168,28 @@ async function updateProjectedCoordinate(newProjectedCoordinate: Coordinate|null
             :remote-url="remoteUrl"
           />
           <RangeInput
-              v-model:lat-range-min="latRangeMin"
-              v-model:lat-range-max="latRangeMax"
-              v-model:lon-range-min="lonRangeMin"
-              v-model:lon-range-max="lonRangeMax"
-              v-model:step="step"
+            v-model:lat-range-min="latRangeMin"
+            v-model:lat-range-max="latRangeMax"
+            v-model:lon-range-min="lonRangeMin"
+            v-model:lon-range-max="lonRangeMax"
+            v-model:step="step"
           />
         </div>
       </div>
       <div
         class="grid grid-cols-1 gap-y-2 auto-rows-min"
-        :class="{invisible: progress === 0}"
+        :class="{ invisible: progress === 0 }"
       >
         <ProgressBar
           :progress="progress"
           :total-projected-samples="totalProjectedSamples"
         />
         <ProjectedCoordinates
-            :x-values="projectedXValues"
-            :y-values="projectedYValues"
-            :color-values="colorValues"
-            :marker-coordinate="markerProjectedCoordinate"
-            @update:marker-coordinate="updateProjectedCoordinate"
+          :x-values="projectedXValues"
+          :y-values="projectedYValues"
+          :color-values="colorValues"
+          :marker-coordinate="markerProjectedCoordinate"
+          @update:marker-coordinate="updateProjectedCoordinate"
         />
         <p class="text-center">Samples successfully projected:</p>
         <ValidCoordinates
