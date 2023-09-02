@@ -72,6 +72,14 @@ const aeqdBbox = {
   step: 1,
 };
 
+const laeaBbox = {
+  latRangeMin: -90,
+  latRangeMax: 90,
+  lonRangeMin: -164.5,
+  lonRangeMax: 194.5,
+  step: 1,
+};
+
 export function getProjectionExamples(): Record<string, Example> {
   return {
     // Conic
@@ -85,7 +93,7 @@ export function getProjectionExamples(): Record<string, Example> {
     ortho: { ...fullBbox, label: 'Orthographic', proj4: '+proj=ortho +lat_0=30 +lon_0=-80 +x_0=0 +y_0=0' },
     geos: { ...fullBbox, label: 'Geostationary Orbit', proj4: '+proj=geos +h=35785831.0 +lon_0=-60 +sweep=y' },
     aeqd: { ...aeqdBbox, label: 'Azimuthal Equidistant', proj4: '+proj=aeqd +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs' },
-    laea: { ...fullBbox, label: 'Lambert Azimuthal Equal Area', proj4: '+proj=laea +lat_0=42 +lon_0=15 +x_0=0 +y_0=0  +units=m' },
+    laea: { ...laeaBbox, label: 'Lambert Azimuthal Equal Area', proj4: '+proj=laea +lat_0=42 +lon_0=15 +x_0=0 +y_0=0  +units=m' },
     qsc: { ...fullBbox, label: 'Quadrilateralized Spherical Cube', proj4: '+proj=qsc +lon_0=0 +units=m +datum=WGS84' },
     stere: { ...stereBbox, label: 'Stereographic', proj4: '+proj=stere +lat_0=-90 +lon_0=0 +x_0=0 +y_0=0 +units=m' },
     sterea: { ...stereBbox, label: 'Oblique Stereographic Alternative', proj4: '+proj=sterea +lat_0=-80 +lon_0=0 +x_0=0 +y_0=0 +units=m' },
@@ -98,7 +106,7 @@ export function getProjectionExamples(): Record<string, Example> {
     // Conformal cylindrical
     eqc: { ...fullBbox, label: 'Equidistant Cylindrical (Plate Carrée)', proj4: '+proj=eqc +lat_0=0 +lon_0=0 +x_0=0 +y_0=0' },
     longlat: { ...fullBbox, label: 'Long/Lat', proj4: '+proj=longlat +lat_0=0 +lon_0=0 +x_0=0 +y_0=0' },
-    merc: { ...fullBbox, label: 'Mercator', proj4: '+proj=merc +lat_0=0 +lon_0=0 +x_0=0 +y_0=0' },
+    merc: { ...fullBbox, label: 'Mercator', proj4: '+proj=merc +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +towgs84=0,0,0,1,1,1,0' },
     tmerc: { ...fullBbox, label: 'Transverse Mercator (EPSG:27700 - British National Grid)', proj4: '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs' },
     utm: { ...fullBbox, label: 'Universal Transverse Mercator (UTM)', proj4: '+proj=utm +zone=32' },
     omerc: { ...fullBbox, label: 'Oblique Mercator', proj4: '+proj=omerc +lat_0=0 +lonc=0 +alpha=0 +k=1 +x_0=0 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs' },
