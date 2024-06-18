@@ -114,6 +114,7 @@ export function getProjectionExamples(): Record<string, Example> {
     gnom: { ...gnomonicBbox, label: 'Gnomonic', proj4: '+proj=gnom +lat_0=90 +lon_0=0 +x_0=6300000 +y_0=6300000 +ellps=WGS84 +datum=WGS84 +units=m +no_defs' },
     moll: { ...fullBbox, label: 'Mollweide', proj4: '+proj=moll +lon_0=150 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs' },
     robin: { ...fullBbox, label: 'Robinson', proj4: '+proj=robin +a=6400000' },
+    eqearth: { ...fullBbox, label: 'Equal Earth', proj4: '+proj=eqearth +lon_0=0 +x_0=0 +y_0=0' },
     sinu: { ...fullBbox, label: 'Sinusoidal (Sanson-Flamsteed)', proj4: '+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371000 +b=6371000 +units=m +no_defs' },
     // Other
     nzmg: { ...nzmgBbox, label: 'New Zealand Map Grid', proj4: '+proj=nzmg +lat_0=-41 +lon_0=173 +x_0=0 +y_0=0' },
@@ -177,6 +178,7 @@ export function getProjectionExampleOptions(): { label: string, options: string[
         'gnom',
         'moll',
         'robin',
+        'eqearth',
         'sinu',
       ],
     },
